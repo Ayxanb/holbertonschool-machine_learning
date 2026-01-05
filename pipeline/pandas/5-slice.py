@@ -12,4 +12,5 @@ def slice(df):
     Returns: the sliced pd.DataFrame
     '''
 
-    return df[["High", "Low", "Close", "Volume_BTC"]].iloc[::60]
+    cols = ["High", "Low", "Close", "Volume_(BTC)"]
+    return df.loc[df.index % 60 == 0, cols]
