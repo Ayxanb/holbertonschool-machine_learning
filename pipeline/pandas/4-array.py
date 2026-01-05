@@ -3,9 +3,6 @@
 ''' this is a docstring :-) '''
 
 
-import pandas as pd
-
-
 def array(df):
     '''
     takes a pd.DataFrame as input and performs the following:
