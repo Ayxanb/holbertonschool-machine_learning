@@ -13,5 +13,4 @@ def array(df):
     Returns: the numpy.ndarray
     '''
 
-    df = df.tail(10)
-    return df.to_numpy()
+    return df[['High', 'Close']].tail(10).to_numpy()
