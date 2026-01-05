@@ -7,9 +7,13 @@ import pandas as pd
 
 df = pd.DataFrame(
     {
-        "First": pd.Series([1], index=list('AB')),
-        "Second": pd.Series([2])
+        "First": pd.Series(
+            [0.0, 0.5, 1.0, 1.5],
+            index=list('ABCD')
+        ),
+        "Second": pd.Series(
+            ['one', 'two', 'three', 'four'],
+            index=list('ABCD')
+        )
     },
 )
-
-print(df)
