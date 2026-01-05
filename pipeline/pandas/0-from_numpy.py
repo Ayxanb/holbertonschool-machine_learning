@@ -2,7 +2,7 @@
 
 """ I hate docstring... """
 
-import numpy as np, pandas as pd
+import pandas as pd
 
 
 def from_numpy(array):
