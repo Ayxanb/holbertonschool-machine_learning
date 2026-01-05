@@ -14,7 +14,8 @@ def rename(df):
     Returns: the modified pd.DataFrame
     '''
 
-    df = df.rename(columns={'Timestamp': 'Datetime'})
-    df['Datetime'] = pd.to_datetime(df['Datetime'], unit='s')
-    return df['Datetime', 'Close']
-
+    df = df.rename(columns={"Timestamp": "Datetime"})
+    df["Datetime"] = pd.to_datetime(df["Datetime"], unit="s")
+    df = df[["Datetime", "Close"]].reset_index(drop=True)
+    df.index = df.index + 35
+    return df
