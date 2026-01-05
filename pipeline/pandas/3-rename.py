@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+''' Hello World :) '''
+
+
+def rename(df):
+    '''
+    takes a pd.DataFrame as input and performs the following:
+
+    df is a pd.DataFrame containing a column named Timestamp.
+    The function should rename the Timestamp column to Datetime.
+    Convert the timestamp values to datatime values
+    Display only the Datetime and Close column
+    Returns: the modified pd.DataFrame
+    '''
+
+    result = df.rename(columns={'Timestamp': 'Datetime'})
+    result['Datetime'] = pd.to_datetime(result['Datetime'])
+    return result['Datetime', 'Close']
+
