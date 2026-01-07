@@ -6,7 +6,6 @@ This module provides `concat` function
 
 import pandas as pd
 
-
 def concat(df1, df2):
     '''
     takes two pd.DataFrame objects and:
@@ -20,7 +19,6 @@ def concat(df1, df2):
     You should use index = __import__('10-index').index
     Returns the concatenated pd.DataFrame.
     '''
-
     index = __import__('10-index').index
 
     df1 = index(df1)
