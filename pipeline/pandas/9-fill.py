@@ -14,6 +14,7 @@ def fill(df):
     Sets missing values in Volume_(BTC) and Volume_(Currency) to 0.
     Returns: the modified pd.DataFrame.
     '''
+    df = df.copy()
     df = df.drop('Weighted_Price')
 
     df['Close'] = df['Close'].ffill()
