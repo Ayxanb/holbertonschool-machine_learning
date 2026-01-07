@@ -4,6 +4,7 @@
 This module contains `flip_switch` function
 '''
 
+
 def flip_switch(df):
     '''
     Sorts the DataFrame in reverse chronological order by its index,
