@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-
 '''
 This module provides `concat` function
 '''
-
 import pandas as pd
+
 
 def concat(df1, df2):
     '''
     takes two pd.DataFrame objects and:
-
     Indexes both dataframes on their Timestamp columns.
     Includes all timestamps from df2 (bitstamp)
     up to and including timestamp 1417411920.
@@ -28,6 +26,5 @@ def concat(df1, df2):
         [df2.loc[df2.index <= 1417411920], df1],
         keys=["bitstamp", "coinbase"]
     )
-
 
     return result
