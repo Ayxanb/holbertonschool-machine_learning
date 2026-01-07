@@ -9,7 +9,8 @@ def analyze(df):
     '''
     takes a pd.DataFrame and:
 
-    Computes descriptive statistics for all columns except the Timestamp column.
+    Computes descriptive statistics
+    for all columns except the Timestamp column.
     Returns a new pd.DataFrame containing these statistics.
     '''
 
