@@ -14,12 +14,15 @@ def fill(df):
     Sets missing values in Volume_(BTC) and Volume_(Currency) to 0.
     Returns: the modified pd.DataFrame.
     '''
+
     df = df.copy()
-    df = df.drop('Weighted_Price')
+
+    if "Weighted_Price" in df.columns:
+        df = df.drop(columns=["Weighted_Price"])
 
     df['Close'] = df['Close'].ffill()
 
-    for col in ["High", "Low", "Open"]:
+    for col in ["Open", "High", "Low"]:
         df[col] = df[col].fillna(df["Close"])
 
     for col in ["Volume_(BTC)", "Volume_(Currency)"]:
