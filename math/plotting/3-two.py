@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""
+This module provides a function to visualize the exponential decay
+of two different radioactive isotopes, Carbon-14 and Radium-226,
+over a period of 20,000 years.
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def two():
+    """
+    Plots the decay curves for C-14 and Ra-226.
+    """
+    x = np.arange(0, 21000, 1000)
+    r = np.log(0.5)
+    t1 = 5730
+    t2 = 1600
+    y1 = np.exp((r / t1) * x)
+    y2 = np.exp((r / t2) * x)
+
+    plt.figure(figsize=(6.4, 4.8))
+
+    plt.xlabel('Time (years)')
+    plt.ylabel('Fraction Remaining')
+    plt.title('Exponential Decay of Radioactive Elements')
+
+    plt.xlim(0, 20000)
+    plt.ylim(0, 1)
+
+    plt.plot(x, y1, color='red', linestyle='--', label='C-14')
+    plt.plot(x, y2, color='green', label='Ra-226')
+    
+    plt.legend()
+    plt.show()
