@@ -8,6 +8,7 @@ over a period of 20,000 years.
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def two():
     """
     Plots the decay curves for C-14 and Ra-226.
@@ -30,6 +31,6 @@ def two():
 
     plt.plot(x, y1, color='red', linestyle='--', label='C-14')
     plt.plot(x, y2, color='green', label='Ra-226')
-    
+
     plt.legend()
     plt.show()
