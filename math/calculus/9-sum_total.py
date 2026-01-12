@@ -2,7 +2,4 @@
 
 
 def summation_i_squared(n):
-    sum = 0
-    for i in range(n):
-        sum += i*i
-    return sum
+    return n * (n + 1) * (n + 2) / 6
