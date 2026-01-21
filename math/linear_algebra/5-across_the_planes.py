@@ -13,5 +13,11 @@ def add_matrices2D(mat1, mat2):
     if len(mat1) == 0 or len(mat2) == 0:
         return None
 
-    return [[a + b for a, b in zip(arr1, arr2)]
-            for arr1, arr2 in zip(mat1, mat2)]
+
+    result = []
+    for i in range(len(mat1)):
+        if len(mat1[i]) != len(mat2[i]):
+            return None
+        result.append([mat1[i][j] + mat2[i][j] for j in range(len(mat1[i]))])
+
+    return result
