@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 
+'''
+This module contains `matrix_shape`
+'''
+
 def matrix_shape(matrix):
+    '''
+    returns the shape of a matrix in a list
+    '''
+
     shape = []
 
     def recursive(a):
