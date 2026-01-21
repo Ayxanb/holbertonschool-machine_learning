@@ -10,9 +10,7 @@ def add_matrices2D(mat1, mat2):
     adds two 2D matrices
     '''
 
-    matrix_shape = __import__('2-size_me_please').matrix_shape
-
-    if matrix_shape(mat1) != matrix_shape(mat2):
+    if len(mat1) == 0 or len(mat2) == 0:
         return None
 
     return [[a + b for a, b in zip(arr1, arr2)]
