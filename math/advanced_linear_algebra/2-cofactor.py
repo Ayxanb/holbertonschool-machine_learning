@@ -29,12 +29,13 @@ def cofactor(matrix):
     for i in range(size):
         row_cofactors = []
         for j in range(size):
-            sub_matrix = [row[:j] + row[j+1:] for row in (matrix[:i] + matrix[i+1:])]
-            
+            sub_matrix = [row[:j] + row[j+1:]
+                          for row in (matrix[:i] + matrix[i+1:])]
+
             minor_val = determinant(sub_matrix)
             cofactor_val = ((-1) ** (i + j)) * minor_val
             row_cofactors.append(cofactor_val)
-            
+
         cofactor_matrix.append(row_cofactors)
 
     return cofactor_matrix
