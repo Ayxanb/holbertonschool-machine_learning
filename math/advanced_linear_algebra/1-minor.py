@@ -28,9 +28,14 @@ def minor(matrix):
     elif rows == 2:
         return [[matrix[1][1], matrix[1][0]], [matrix[0][1], matrix[0][0]]]
 
+    determinant = __import__('0-determinant').determinant
+
     minor_matrix = []
     for j in range(rows):
-        minor = [row[:j] + row[j+1:] for row in matrix[1:]]
-        minor_matrix.append(minor)
+        current_row = []
+        for j in range(rows):
+            minor = [row[:j] + row[j+1:] for row in matrix[1:]]
+            current_row.append(determinant(minor))
+        minor_matrix.append(current_row)
 
     return minor_matrix
