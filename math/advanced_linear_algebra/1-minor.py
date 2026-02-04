@@ -29,7 +29,8 @@ def minor(matrix):
     for i in range(size):
         row_minors = []
         for j in range(size):
-            sub_matrix = [row[:j] + row[j+1:] for row in (matrix[:i] + matrix[i+1:])]
+            sub_matrix = [row[:j] + row[j+1:] 
+                    for row in (matrix[:i] + matrix[i+1:])]
             row_minors.append(determinant(sub_matrix))
         minor_matrix.append(row_minors)
 
