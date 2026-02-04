@@ -20,7 +20,7 @@ def minor(matrix):
     rows = len(matrix)
 
     if not all(len(row) == rows for row in matrix):
-        raise ValueError("matrix must be a square matrix")
+        raise ValueError("matrix must be a non-empty square matrix")
 
     if rows == 1:
         return matrix[0][0]
