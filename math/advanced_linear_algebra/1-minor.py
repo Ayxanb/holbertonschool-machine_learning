@@ -26,7 +26,7 @@ def minor(matrix):
         return [[1]]
 
     elif rows == 2:
-        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+        return [[matrix[1][1], matrix[1][0]], [matrix[0][1], matrix[0][0]]]
 
     minor_matrix = []
     for j in range(rows):
