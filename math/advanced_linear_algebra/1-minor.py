@@ -23,7 +23,7 @@ def minor(matrix):
         raise ValueError("matrix must be a non-empty square matrix")
 
     if rows == 1:
-        return matrix[0][0]
+        return [[1]]
 
     elif rows == 2:
         return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
