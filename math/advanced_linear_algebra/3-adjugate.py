@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-
 '''
 This module contains `adjugate` function
 '''
 
-
 def adjugate(matrix):
     '''
-    Returns the adjugate matrix
+    Calculates the adjugate matrix of a matrix
     '''
     cofactor = __import__('2-cofactor').cofactor
 
@@ -26,5 +24,6 @@ def adjugate(matrix):
     if size == 1:
         return [[1]]
 
-    cofactor_matrix = cofactor(matrix)
-    return [list(i) for i in zip(*matrix)]
+    cof_mat = cofactor(matrix)
+
+    return [list(row) for row in zip(*cof_mat)]
