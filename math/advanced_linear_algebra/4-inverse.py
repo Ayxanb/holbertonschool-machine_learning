@@ -3,6 +3,7 @@
 This module contains `inverse` function
 '''
 
+
 def inverse(matrix):
     '''
     Calculates the inverse of a matrix
