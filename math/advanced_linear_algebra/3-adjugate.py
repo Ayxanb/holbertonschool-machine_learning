@@ -3,6 +3,7 @@
 This module contains `adjugate` function
 '''
 
+
 def adjugate(matrix):
     '''
     Calculates the adjugate matrix of a matrix
