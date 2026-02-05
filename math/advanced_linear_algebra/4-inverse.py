@@ -25,9 +25,6 @@ def inverse(matrix):
     if det == 0:
         return None
 
-    if size == 1:
-        return [[1 / matrix[0][0]]]
-
     adj_mat = adjugate(matrix)
     inv_matrix = [[val / det for val in row] for row in adj_mat]
 
