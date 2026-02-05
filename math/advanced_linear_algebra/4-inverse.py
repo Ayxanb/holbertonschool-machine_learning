@@ -35,4 +35,4 @@ def inverse(matrix):
     adjugate_matrix = adjugate(matrix)
     det = determinant(matrix)
 
-    return list(map(lambda x: x/det, row for row in adjugate_matrix))
+    return list(map(lambda x: x/det, (row for row in adjugate_matrix)))
