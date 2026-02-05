@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 '''
+This module contains `inverse` function
 '''
 
 
 def inverse(matrix):
     '''
+    returns the inverse of matrix
     '''
 
     determinant = __import__('0-determinant').determinant
