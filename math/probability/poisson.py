@@ -25,4 +25,5 @@ class Poisson:
         elif len(data) < 2:
             raise ValueError("data must contain multiple values")
 
-        self.lambtha = sum(data) / len(data)
+        else:
+            self.lambtha = sum(data) / len(data)
