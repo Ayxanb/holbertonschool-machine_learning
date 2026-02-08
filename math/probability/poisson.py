@@ -2,7 +2,6 @@
 """
 This module defines a Poisson distribution class.
 """
-import math
 
 
 class Poisson:
@@ -40,5 +39,10 @@ class Poisson:
         if k < 0:
             return 0
 
-        return ((self.lambtha ** k) * math.exp(-self.lambtha) /
-                math.factorial(k))
+        e = 2.718281828459045
+
+        factorial = 1
+        for i in range(1, k + 1):
+            factorial *= i
+
+        return (e ** (-self.lambtha)) * (self.lambtha ** k) / factorial
