@@ -2,6 +2,7 @@
 """
 This module defines a Poisson distribution class.
 """
+import math
 
 
 class Poisson:
@@ -27,3 +28,17 @@ class Poisson:
 
         else:
             self.lambtha = sum(data) / len(data)
+
+    def pmf(self, k):
+        '''
+        Calculates the value of the PMF for a given number of "successes"
+        '''
+
+        if not isinstance(k, int):
+            k = int(k)
+
+        if k < 0:
+            return 0
+
+        return ((self.lambtha ** k) * math.exp(-self.lambtha) /
+                math.factorial(k))
