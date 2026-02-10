@@ -59,7 +59,7 @@ class Poisson:
         '''
 
         _cdf = 0
-        for i in range(int(k.__ceil__())):
+        for i in range(int(k.__round__())):
             _cdf += self.pmf(i)
 
         return _cdf
