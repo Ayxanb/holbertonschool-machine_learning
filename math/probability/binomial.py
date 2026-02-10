@@ -3,7 +3,7 @@
 '''
 
 
-class Binomal:
+class Binomial:
     '''
     '''
 
