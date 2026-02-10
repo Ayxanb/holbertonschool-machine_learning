@@ -91,5 +91,5 @@ class Normal:
         Calculates the CDF
         """
         return 0.5 * (
-            1 + erf((x - self.mean) / (2 ** 0.5 * self.stddev))
+            1 + self.erf((x - self.mean) / (2 ** 0.5 * self.stddev))
         )
