@@ -50,7 +50,6 @@ class Poisson:
 
         return (e ** (-self.lambtha)) * (self.lambtha ** k) / factorial
 
-
     def cdf(self, k):
         '''
         Cumulative Distribution Function
