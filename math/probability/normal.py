@@ -62,34 +62,13 @@ class Normal:
             e ** (-0.5 * ((x - self.mean) / self.stddev) ** 2)
         )
 
-    def erf(self, x):
-        """
-        Manual implementation of the Error Function (erf)
-        Approximation via Abramowitz and Stegun
-        """
-        # Save the sign of x
-        sign = 1 if x >= 0 else -1
-        x = abs(x)
-
-        # Constants for the approximation
-        a1 = 0.254829592
-        a2 = -0.284496736
-        a3 = 1.421413741
-        a4 = -1.453152027
-        a5 = 1.061405429
-        p = 0.3275911
-
-        # A&S formula 7.1.26
-        t = 1.0 / (1.0 + p * x)
-        y = 1.0 - (
-            ((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * e**(-x*x)
-
-        return sign * y
-
     def cdf(self, x):
         """
         Calculates the CDF
         """
-        return 0.5 * (
-            1 + self.erf((x - self.mean) / (2 ** 0.5 * self.stddev))
+        val = (x - self.mean) / (self.stddev * (2 ** 0.5))
+        erf = (2 / (pi ** 0.5)) * (
+            val - (val ** 3) / 3 + (val ** 5) / 10 -
+            (val ** 7) / 42 + (val ** 9) / 216
         )
+        return 0.5 * (1 + erf)
