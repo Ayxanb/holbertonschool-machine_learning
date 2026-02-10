@@ -29,4 +29,3 @@ class Exponential:
 
         else:
             self.lambtha = len(data) / sum(data)
-
