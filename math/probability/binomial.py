@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 '''
+This module contains `Binomial` class
 '''
 
 
 class Binomial:
     '''
+    Binomial distribution class
     '''
 
     def __init__(self, data=None, n=1, p=0.5):
@@ -16,7 +18,7 @@ class Binomial:
         '''
 
         if data is None:
-            if n < 0:
+            if n <= 0:
                 raise ValueError('n must be a positive value')
 
             if not (0 < p < 1):
