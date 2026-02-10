@@ -38,7 +38,7 @@ def intersection(x, n, P, Pr):
     fact_x = np.math.factorial(x)
     fact_nx = np.math.factorial(n - x)
     comb = fact_n / (fact_x * fact_nx)
-    
+
     likelihood = comb * (P ** x) * ((1 - P) ** (n - x))
 
     return likelihood * Pr
