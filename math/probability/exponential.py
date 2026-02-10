@@ -50,4 +50,7 @@ class Exponential:
         that the time until the next event is less than or equal to `x`.
         '''
 
+        if x < 0:
+            return 0
+
         return 1 - e ** (-self.lambtha * x)
