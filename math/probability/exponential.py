@@ -3,6 +3,8 @@
 This module contains `Exponential` class
 '''
 
+e = 2.7182818285
+
 
 class Exponential:
     '''
@@ -29,3 +31,23 @@ class Exponential:
 
         else:
             self.lambtha = len(data) / sum(data)
+
+    def pdf(self, x):
+        '''
+        Probability Density Function
+        The PDF describes the likelihood of the random variable `x`
+        '''
+
+        if x < 0:
+            return 0
+
+        return self.lambtha * e ** (-self.lambtha * x)
+
+    def cdf(self, x):
+        '''
+        Cumulative Distribution Function
+        The CDF calculates the probability
+        that the time until the next event is less than or equal to `x`.
+        '''
+
+        return 1 - e ** (-self.lambtha * x)
