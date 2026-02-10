@@ -35,3 +35,27 @@ class Normal:
             self.mean = sum(data) / n
             _sum = sum((x - self.mean) ** 2 for x in data)
             self.stddev = (_sum / n) ** 0.5
+
+    def z_score(self, x):
+        '''
+        The `z` Value (The Standardized Score)
+        '''
+
+        return (x - self.mean) / self.stddev
+
+    def x_value(self, z):
+        '''
+        The `x` Value (The Raw Score)
+        '''
+
+        return self.mean + z * self.stddev
+
+    def pdf(self, x):
+        '''
+        '''
+        return
+
+    def cdf(self, x):
+        '''
+        '''
+        return
