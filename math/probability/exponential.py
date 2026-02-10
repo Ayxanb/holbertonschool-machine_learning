@@ -17,7 +17,7 @@ class Exponential:
         '''
 
         if data is None:
-            if lambtha < 0.:
+            if lambtha <= 0.:
                 raise ValueError('lambtha must be a positive value')
             self.lambtha = lambtha
 
