@@ -3,6 +3,9 @@
 This module defines a Poisson distribution class.
 """
 
+pi = 3.1415926536
+e = 2.7182818285
+
 
 class Poisson:
     """
@@ -30,7 +33,9 @@ class Poisson:
 
     def pmf(self, k):
         '''
-        Calculates the value of the PMF for a given number of "successes"
+        Probability Mass Function
+        The PMF tells you the exact probability
+        that an event happens exactly `k` times.
         '''
 
         if not isinstance(k, int):
@@ -39,10 +44,23 @@ class Poisson:
         if k < 0:
             return 0
 
-        e = 2.7182818285
-
         factorial = 1
         for i in range(1, k + 1):
             factorial *= i
 
         return (e ** (-self.lambtha)) * (self.lambtha ** k) / factorial
+
+
+    def cdf(self, k):
+        '''
+        Cumulative Distribution Function
+        The CDF tells the probability that
+        the number of events is less than or equal to a certain value.
+        It's calculated by summing the PMFs for all values from 0 up to `k`
+        '''
+
+        _cdf = 0
+        for i in range(k):
+            _cdf += self.pmf(i)
+
+        return _cdf
