@@ -35,7 +35,7 @@ class Normal:
             self.mean = sum(data) / n
 
             _sum = 0
-            for i in range(1, n):
+            for i in range(n):
                 _sum += (data[i] - self.mean) ** 2
 
             self.stddev = (_sum / (n - 1)) ** 0.5
