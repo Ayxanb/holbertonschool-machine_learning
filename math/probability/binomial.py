@@ -52,7 +52,7 @@ class Binomial:
                 f *= i
             return f
 
-        n_choose_k = fact(self.n) / (fact(k) * fact(self.n - k))        
+        n_choose_k = fact(self.n) / (fact(k) * fact(self.n - k))
         return n_choose_k * (self.p ** k) * ((1 - self.p) ** (self.n - k))
 
     def cdf(self, k):
@@ -66,5 +66,5 @@ class Binomial:
         total_p = 0
         for i in range(k + 1):
             total_p += self.pmf(i)
-            
+
         return total_p
