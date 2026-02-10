@@ -7,7 +7,7 @@ import numpy as np
 
 def likelihood(x, n, P):
     """
-    Calculates the likelihood of obtaining data x and n for 
+    Calculates the likelihood of obtaining data x and n for
     various hypothetical probabilities in P.
     """
 
