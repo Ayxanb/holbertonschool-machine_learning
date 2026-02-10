@@ -33,7 +33,7 @@ class Normal:
         else:
             n = len(data)
             self.mean = sum(data) / n
-            
+
             _sum = 0
             for i in range(1, n):
                 _sum += (data[i] - self.mean) ** 2
