@@ -12,6 +12,8 @@ class Exponential:
     def __init__(self, data=None, lambtha=1.):
         '''
         Initializes Exponential class
+        data: List of the data to be used to estimate the distribution
+        lambtha: The expected number of occurences in a given time frame
         '''
 
         if data is None:
@@ -26,5 +28,5 @@ class Exponential:
             raise ValueError('data must contain multiple values')
 
         else:
-            self.lambtha = sum(data) / len(data)
+            self.lambtha = len(data) / sum(data)
 
