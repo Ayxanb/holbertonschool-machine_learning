@@ -42,6 +42,6 @@ def posterior(x, n, P, Pr):
     likelihood = comb * (P ** x) * ((1 - P) ** (n - x))
 
     intersection = likelihood * Pr
-    marginal = np.sum(intersection
+    marginal = np.sum(intersection)
 
     return intersection / marginal
