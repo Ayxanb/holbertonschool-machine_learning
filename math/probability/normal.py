@@ -38,4 +38,4 @@ class Normal:
             for i in range(1, n):
                 _sum += (data[i] - self.mean) ** 2
 
-            self.stddev = (_sum / n) ** 0.5
+            self.stddev = (_sum / (n - 1)) ** 0.5
