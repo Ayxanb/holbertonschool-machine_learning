@@ -19,5 +19,5 @@ def create_confusion_matrix(labels, logits):
     # Each 'a' is the row (Actual), each 'p' is the column (Predicted)
     for a, p in zip(actual, predicted):
         confusion[a, p] += 1
-        
+
     return confusion
