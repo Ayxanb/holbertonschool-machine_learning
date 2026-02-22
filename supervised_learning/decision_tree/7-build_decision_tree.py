@@ -103,7 +103,8 @@ class Leaf(Node):
         self.value, self.is_leaf, self.depth = value, True, depth
 
     def max_depth_below(self):
-        return self.depth
+         """Finds max depth recursively."""
+         return self.depth
 
     def count_nodes_below(self, only_leaves=False):
         return 1
