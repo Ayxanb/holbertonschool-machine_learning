@@ -68,6 +68,19 @@ class Decision_Tree():
         self.split_criterion = split_criterion
         self.predict = None
 
+    def count_nodes_below(self, only_leaves=False):
+        """
+        Recursively counts the nodes in the subtree
+        """
+        left_count = self.left_child.count_nodes_below(only_leaves=only_leaves)
+        right_count = self.right_child.count_nodes_below(only_leaves=only_leaves)
+
+        if only_leaves:
+            return left_count + right_count
+
+        return 1 + left_count + right_count
+
+
     def depth(self):
         """Returns the maximum depth of the tree"""
         return self.root.max_depth_below()
