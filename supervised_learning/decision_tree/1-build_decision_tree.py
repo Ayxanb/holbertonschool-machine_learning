@@ -25,14 +25,22 @@ class Node:
         Recursively finds the maximum depth of any node
         in the subtree rooted at this node.
         """
-        # Get the max depth from the left subtree
         left_max = self.left_child.max_depth_below()
-
-        # Get the max depth from the right subtree
         right_max = self.right_child.max_depth_below()
-
-        # Return the larger of the two
         return max(left_max, right_max)
+
+    def count_nodes_below(self, only_leaves=False):
+        """
+        Recursively counts the nodes in the subtree
+        """
+        left_count = self.left_child.count_nodes_below(only_leaves=only_leaves)
+        right_count = self.right_child.count_nodes_below(
+            only_leaves=only_leaves)
+
+        if only_leaves:
+            return left_count + right_count
+
+        return 1 + left_count + right_count
 
 
 class Leaf(Node):
@@ -48,6 +56,10 @@ class Leaf(Node):
     def max_depth_below(self):
         """Returns the depth of the leaf"""
         return self.depth
+
+    def count_nodes_below(self, only_leaves=False):
+        """Returns 1 for the leaf node itself"""
+        return 1
 
 
 class Decision_Tree():
@@ -68,19 +80,12 @@ class Decision_Tree():
         self.split_criterion = split_criterion
         self.predict = None
 
-    def count_nodes_below(self, only_leaves=False):
-        """
-        Recursively counts the nodes in the subtree
-        """
-        left_count = self.left_child.count_nodes_below(only_leaves=only_leaves)
-        right_count = self.right_child.count_nodes_below(only_leaves=only_leaves)
-
-        if only_leaves:
-            return left_count + right_count
-
-        return 1 + left_count + right_count
-
-
     def depth(self):
         """Returns the maximum depth of the tree"""
         return self.root.max_depth_below()
+
+    def count_nodes(self, only_leaves=False):
+        """
+        Entry point to count nodes starting from the root
+        """
+        return self.root.count_nodes_below(only_leaves=only_leaves)
