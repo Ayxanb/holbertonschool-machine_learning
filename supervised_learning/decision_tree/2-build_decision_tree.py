@@ -7,13 +7,11 @@ import numpy as np
 
 def left_child_add_prefix(text):
     """
-    Adds prefix for a child that is NOT the last child.
-    The pipe '|' must continue down to connect to the next sibling.
+    Adds prefixes for left children. 
+    The first line gets the arrow, others get the vertical bar.
     """
     lines = text.splitlines()
-    # First line gets the branch arrow
     new_text = "+---> " + lines[0] + "\n"
-    # Following lines get a vertical pipe to continue the line
     for line in lines[1:]:
         new_text += "| " + line + "\n"
     return new_text
@@ -21,13 +19,11 @@ def left_child_add_prefix(text):
 
 def right_child_add_prefix(text):
     """
-    Adds prefix for the LAST child of a node.
-    No pipe is needed below this branch.
+    Adds prefixes for right children.
+    The first line gets the arrow, others get empty space.
     """
     lines = text.splitlines()
-    # First line gets the branch arrow
     new_text = "+---> " + lines[0] + "\n"
-    # Following lines get empty spaces
     for line in lines[1:]:
         new_text += "  " + line + "\n"
     return new_text
@@ -62,16 +58,19 @@ class Node:
         return 1 + left_count + right_count
 
     def __str__(self):
-        """Returns string representation matching the checker's format"""
-        if self.is_root:
-            out = f"root [feature={self.feature}, threshold={self.threshold}]\n"
-        else:
-            out = f"node [feature={self.feature}, threshold={self.threshold}]\n"
-
-        out += left_child_add_prefix(self.left_child.__str__())
-        out += right_child_add_prefix(self.right_child.__str__())
-
-        return out
+        """
+        Recursive string representation to match specific stdout.
+        """
+        label = "root" if self.is_root else "node"
+        out = f"{label} [feature={self.feature}, threshold={self.threshold}]\n"
+        
+        if self.left_child is not None:
+            out += left_child_add_prefix(self.left_child.__str__())
+            
+        if self.right_child is not None:
+            out += right_child_add_prefix(self.right_child.__str__())
+            
+        return out.rstrip("\n")
 
 
 class Leaf(Node):
