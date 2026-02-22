@@ -1,8 +1,30 @@
 #!/usr/bin/env python3
 """
-Module to define a Decision Tree structure with string representation
+Module to define a Decision Tree structure with custom string representation
 """
 import numpy as np
+
+
+def left_child_add_prefix(text):
+    """
+    Adds prefix for left child branches to match desired output
+    """
+    lines = text.splitlines()
+    new_text = "  +---> " + lines[0] + "\n"
+    for line in lines[1:]:
+        new_text += "  | " + line + "\n"
+    return (new_text)
+
+
+def right_child_add_prefix(text):
+    """
+    Adds prefix for right child branches to match desired output
+    """
+    lines = text.splitlines()
+    new_text = "  +---> " + lines[0] + "\n"
+    for line in lines[1:]:
+        new_text += "    " + line + "\n"
+    return (new_text)
 
 
 class Node:
@@ -37,14 +59,15 @@ class Node:
         if self.is_root:
             out = f"root [feature={self.feature}, threshold={self.threshold}]\n"
         else:
-            out = f"-> node [feature={self.feature}, threshold={self.threshold}]\n"
+            out = (f"node [feature={self.feature}, "
+                   f"threshold={self.threshold}]\n")
 
         # Add left child with its specific prefix
-        left_str = left_child_add_prefix(self.left_child.__str__())
+        out += left_child_add_prefix(self.left_child.__str__())
         # Add right child with its specific prefix
-        right_str = right_child_add_prefix(self.right_child.__str__())
+        out += right_child_add_prefix(self.right_child.__str__())
 
-        return out + left_str + right_str
+        return out
 
 
 class Leaf(Node):
@@ -65,7 +88,7 @@ class Leaf(Node):
 
     def __str__(self):
         """Returns string representation of the leaf"""
-        return f"-> leaf [value={self.value}]"
+        return f"leaf [value={self.value}]"
 
 
 class Decision_Tree():
