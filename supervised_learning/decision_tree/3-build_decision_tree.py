@@ -96,6 +96,10 @@ class Leaf(Node):
         """Returns 1 for the leaf"""
         return 1
 
+    def get_leaves_below(self):
+        """Returns the leaf itself in a list"""
+        return [self]
+
     def __str__(self):
         """Leaf string without extra arrows (arrows added by prefix)"""
         return f"leaf [value={self.value}]"
@@ -121,6 +125,10 @@ class Decision_Tree():
     def count_nodes(self, only_leaves=False):
         """Counts nodes starting from root"""
         return self.root.count_nodes_below(only_leaves=only_leaves)
+
+    def get_leaves(self):
+        """Entry point for the checker to retrieve all leaves"""
+        return self.root.get_leaves_below()
 
     def __str__(self):
         """Entry point for tree string representation"""
