@@ -405,6 +405,48 @@ class Decision_Tree():
         return np.sum(np.equal(self.predict(test_explanatory),
                                test_target)) / test_target.size
 
+    def np_extrema(self, arr):
+        """Returns the minimum and maximum of an array"""
+        return np.min(arr), np.max(arr)
+
+    def random_split_criterion(self, node):
+        """Determines a random feature and threshold for splitting"""
+        diff = 0
+        while diff == 0:
+            feature = self.rng.integers(0, self.explanatory.shape[1])
+            feature_min, feature_max = self.np_extrema(
+                self.explanatory[:, feature][node.sub_population]
+            )
+            diff = feature_max - feature_min
+        x = self.rng.uniform()
+        threshold = (1 - x) * feature_min + x * feature_max
+        return feature, threshold
+
+    def fit(self, explanatory, target, verbose=0):
+        """Trains the decision tree"""
+        if self.split_criterion == "random":
+            self.split_criterion = self.random_split_criterion
+        else:
+            # Placeholder for Gini (prevents error if called)
+            self.split_criterion = getattr(self, "Gini_split_criterion",
+                                           self.random_split_criterion)
+
+        self.explanatory = explanatory
+        self.target = target
+        self.root.sub_population = np.ones_like(self.target, dtype='bool')
+
+        self.fit_node(self.root)
+        self.update_predict()
+
+        if verbose == 1:
+            print(f"  Training finished.\n"
+                  f"- Depth                     : {self.depth()}\n"
+                  f"- Number of nodes           : {self.count_nodes()}\n"
+                  f"- Number of leaves          : "
+                  f"{self.count_nodes(only_leaves=True)}\n"
+                  f"- Accuracy on training data : "
+                  f"{self.accuracy(self.explanatory, self.target)}"
+
     def __str__(self):
         """Entry point for tree string representation"""
         return self.root.__str__()
