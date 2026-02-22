@@ -35,7 +35,8 @@ class Random_Forest:
         # Collect predictions from each tree: results in shape (n_trees, n)
         all_tree_preds = np.array([p(explanatory) for p in self.numpy_preds])
 
-        # To find the mode without complex loops, we can use bincount per column
+        # To find the mode without complex loops,
+        # we can use bincount per column
         # or simply transpose and apply a custom mode function.
         # Here we use a robust method to find the mode along axis 0.
         def get_mode(column):
