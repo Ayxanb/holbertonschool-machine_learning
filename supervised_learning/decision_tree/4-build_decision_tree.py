@@ -71,23 +71,21 @@ class Node:
 
     def update_bounds_below(self):
         """
-        Recursively compute the lower and upper bounds
-        for each feature at each node.
+        Recursively compute the lower and upper bounds for each feature.
+        Note: Left child = Greater than threshold;
+        Right child = Less than or equal to threshold.
         """
         if self.is_root:
-            # Note: In a real tree, you'd initialize for all features
             self.upper = {0: np.inf}
             self.lower = {0: -np.inf}
 
-        # Prepare left child bounds
         self.left_child.lower = self.lower.copy()
         self.left_child.upper = self.upper.copy()
-        self.left_child.upper[self.feature] = self.threshold
+        self.left_child.lower[self.feature] = self.threshold
 
-        # Prepare right child bounds
         self.right_child.lower = self.lower.copy()
         self.right_child.upper = self.upper.copy()
-        self.right_child.lower[self.feature] = self.threshold
+        self.right_child.upper[self.feature] = self.threshold
 
         for child in [self.left_child, self.right_child]:
             child.update_bounds_below()
