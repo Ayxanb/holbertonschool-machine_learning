@@ -37,6 +37,7 @@ class Node:
     """Represents a node in a decision tree"""
     def __init__(self, feature=None, threshold=None, left_child=None,
                  right_child=None, is_root=False, depth=0):
+        """Initializes a node"""
         self.feature = feature
         self.threshold = threshold
         self.left_child = left_child
@@ -65,7 +66,8 @@ class Node:
         """
         Recursively retrieves all leaf nodes in the subtree
         """
-        return self.left_child.get_leaves_below() + self.right_child.get_leaves_below()
+        return (self.left_child.get_leaves_below() +
+                self.right_child.get_leaves_below())
 
     def __str__(self):
         """Returns string representation matching the checker's format"""
@@ -83,6 +85,7 @@ class Node:
 class Leaf(Node):
     """Represents a leaf in a decision tree"""
     def __init__(self, value, depth=None):
+        """Initializes a leaf"""
         super().__init__()
         self.value = value
         self.is_leaf = True
@@ -102,7 +105,7 @@ class Leaf(Node):
 
     def __str__(self):
         """
-        Returns string representation of the leaf 
+        Returns string representation of the leaf
         matching the desired output format.
         """
         return f"-> leaf [value={self.value}]"
@@ -112,6 +115,7 @@ class Decision_Tree():
     """Represents a decision tree model"""
     def __init__(self, max_depth=10, min_pop=1, seed=0,
                  split_criterion="random", root=None):
+        """Initializes the decision tree"""
         self.rng = np.random.default_rng(seed)
         if root:
             self.root = root
