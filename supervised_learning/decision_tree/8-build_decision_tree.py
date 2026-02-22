@@ -6,20 +6,24 @@ import numpy as np
 
 
 def left_child_add_prefix(text):
-    """Prefix for non-last child branches."""
+    """
+    Adds prefixes for left children with vertical bars for alignment.
+    """
     lines = text.splitlines()
-    new_text = "+---> " + lines[0] + "\n"
+    new_text = "    +---> " + lines[0] + "\n"
     for line in lines[1:]:
-        new_text += "| " + line + "\n"
+        new_text += "    |      " + line + "\n"
     return new_text
 
 
 def right_child_add_prefix(text):
-    """Prefix for last child branches."""
+    """
+    Adds prefixes for right children with empty space for alignment.
+    """
     lines = text.splitlines()
-    new_text = "+---> " + lines[0] + "\n"
+    new_text = "    +---> " + lines[0] + "\n"
     for line in lines[1:]:
-        new_text += "  " + line + "\n"
+        new_text += "           " + line + "\n"
     return new_text
 
 
@@ -88,12 +92,17 @@ class Node:
         return self.right_child.pred(x)
 
     def __str__(self):
+        """
+        Recursive string representation of a Node and its children.
+        """
         label = "root" if self.is_root else "node"
-        out = f"{label} [feature={self.feature}, " \
-              f"threshold={self.threshold}]\n"
-        out += left_child_add_prefix(self.left_child.__str__())
-        out += right_child_add_prefix(self.right_child.__str__())
-        return out
+        out = f"{label} [feature={self.feature}, threshold={self.threshold}]\n"
+        if self.left_child:
+            out += left_child_add_prefix(self.left_child.__str__())
+        if self.right_child:
+            out += right_child_add_prefix(self.right_child.__str__())
+        # Remove trailing newline for proper recursion nesting
+        return out.rstrip()
 
 
 class Leaf(Node):
