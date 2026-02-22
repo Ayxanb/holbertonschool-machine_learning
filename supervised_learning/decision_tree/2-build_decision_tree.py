@@ -7,7 +7,8 @@ import numpy as np
 
 def left_child_add_prefix(text):
     """
-    Adds prefix for left child branches to match desired output
+    Adds prefix for left child branches.
+    Uses '  +---> ' for the first line and '  | ' for subsequent lines.
     """
     lines = text.splitlines()
     new_text = "  +---> " + lines[0] + "\n"
@@ -18,7 +19,8 @@ def left_child_add_prefix(text):
 
 def right_child_add_prefix(text):
     """
-    Adds prefix for right child branches to match desired output
+    Adds prefix for right child branches.
+    Uses '  +---> ' for the first line and '    ' for subsequent lines.
     """
     lines = text.splitlines()
     new_text = "  +---> " + lines[0] + "\n"
@@ -49,7 +51,8 @@ class Node:
     def count_nodes_below(self, only_leaves=False):
         """Recursively counts the nodes"""
         left_count = self.left_child.count_nodes_below(only_leaves=only_leaves)
-        right_count = self.right_child.count_nodes_below(only_leaves)
+        right_count = self.right_child.count_nodes_below(
+            only_leaves=only_leaves)
         if only_leaves:
             return left_count + right_count
         return 1 + left_count + right_count
@@ -62,9 +65,8 @@ class Node:
             out = (f"node [feature={self.feature}, "
                    f"threshold={self.threshold}]\n")
 
-        # Add left child with its specific prefix
+        # Recursively call __str__ on children and apply prefixes
         out += left_child_add_prefix(self.left_child.__str__())
-        # Add right child with its specific prefix
         out += right_child_add_prefix(self.right_child.__str__())
 
         return out
@@ -113,5 +115,5 @@ class Decision_Tree():
         return self.root.count_nodes_below(only_leaves=only_leaves)
 
     def __str__(self):
-        """Returns the string representation of the tree"""
+        """Entry point for tree string representation"""
         return self.root.__str__()
