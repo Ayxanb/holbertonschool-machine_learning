@@ -101,8 +101,11 @@ class Leaf(Node):
         return [self]
 
     def __str__(self):
-        """Leaf string without extra arrows (arrows added by prefix)"""
-        return f"leaf [value={self.value}]"
+        """
+        Returns string representation of the leaf 
+        matching the desired output format.
+        """
+        return f"-> leaf [value={self.value}]"
 
 
 class Decision_Tree():
