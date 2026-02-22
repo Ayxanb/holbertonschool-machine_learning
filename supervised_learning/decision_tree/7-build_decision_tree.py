@@ -445,7 +445,7 @@ class Decision_Tree():
                   f"- Number of leaves          : "
                   f"{self.count_nodes(only_leaves=True)}\n"
                   f"- Accuracy on training data : "
-                  f"{self.accuracy(self.explanatory, self.target)}"
+                  f"{self.accuracy(self.explanatory, self.target)}")
 
     def __str__(self):
         """Entry point for tree string representation"""
