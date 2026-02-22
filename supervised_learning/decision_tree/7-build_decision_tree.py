@@ -170,28 +170,58 @@ class Leaf(Node):
 
 
 class Decision_Tree:
-    """Decision Tree model."""
+    """
+    A decision tree classifier that supports random and Gini splitting.
+    """
     def __init__(self, max_depth=10, min_pop=1, seed=0,
                  split_criterion="random", root=None):
+        """
+        Initializes the Decision Tree.
+
+        Args:
+            max_depth (int): Maximum depth of the tree.
+            min_pop (int): Minimum number of individuals to split a node.
+            seed (int): Seed for the random number generator.
+            split_criterion (str): Method to choose splits ("random", "Gini").
+            root (Node): Root node of the tree.
+        """
         self.rng = np.random.default_rng(seed)
         self.root = root if root else Node(is_root=True)
         self.max_depth, self.min_pop = max_depth, min_pop
         self.split_criterion = split_criterion
 
     def depth(self):
+        """
+        Returns the maximum depth of the tree.
+
+        Returns:
+            int: Maximum depth level.
+        """
         return self.root.max_depth_below()
 
     def count_nodes(self, only_leaves=False):
+        """
+        Counts the nodes in the tree.
+
+        Args:
+            only_leaves (bool): If True, only counts leaf nodes.
+
+        Returns:
+            int: Total count of nodes or leaves.
+        """
         return self.root.count_nodes_below(only_leaves)
 
     def update_predict(self):
-        """Prepares the vectorized predict function."""
+        """
+        Builds a vectorized prediction function based on leaf indicators.
+        """
         self.root.update_bounds_below()
         leaves = self.root.get_leaves_below()
         for leaf in leaves:
             leaf.update_indicator()
 
         def predict_func(A):
+            """Vectorized prediction internal function."""
             predictions = np.zeros(A.shape[0])
             for leaf in leaves:
                 predictions[leaf.indicator(A)] = leaf.value
@@ -199,7 +229,15 @@ class Decision_Tree:
         self.predict = predict_func
 
     def random_split_criterion(self, node):
-        """Randomly selects a feature and threshold for splitting."""
+        """
+        Chooses a random feature and threshold for splitting.
+
+        Args:
+            node (Node): The node to be split.
+
+        Returns:
+            tuple: (feature_index, threshold)
+        """
         diff = 0
         while diff == 0:
             feat = self.rng.integers(0, self.explanatory.shape[1])
@@ -210,7 +248,14 @@ class Decision_Tree:
         return feat, (1 - x) * f_min + x * f_max
 
     def fit(self, explanatory, target, verbose=0):
-        """Trains the tree on provided data."""
+        """
+        Trains the tree using the provided features and targets.
+
+        Args:
+            explanatory (numpy.ndarray): 2D array of features.
+            target (numpy.ndarray): 1D array of target labels.
+            verbose (int): If 1, prints training statistics.
+        """
         if self.split_criterion == "random":
             self.split_criterion = self.random_split_criterion
         else:
@@ -231,7 +276,12 @@ class Decision_Tree:
                   f"{self.accuracy(explanatory, target)}")
 
     def fit_node(self, node):
-        """Recursive node splitting logic."""
+        """
+        Recursively builds children for a node until leaf criteria are met.
+
+        Args:
+            node (Node): The node to process.
+        """
         targets = self.target[node.sub_population]
         if (node.depth >= self.max_depth or len(targets) <= self.min_pop or
                 np.unique(targets).size == 1):
@@ -259,8 +309,23 @@ class Decision_Tree:
                 self.fit_node(child)
 
     def accuracy(self, explanatory, target):
-        """Calculates mean accuracy."""
+        """
+        Calculates the classification accuracy.
+
+        Args:
+            explanatory (numpy.ndarray): 2D array of features.
+            target (numpy.ndarray): 1D array of target labels.
+
+        Returns:
+            float: Percentage of correct predictions.
+        """
         return np.mean(self.predict(explanatory) == target)
 
     def __str__(self):
+        """
+        Returns string representation of the root node.
+
+        Returns:
+            str: The tree structure as a string.
+        """
         return self.root.__str__()
