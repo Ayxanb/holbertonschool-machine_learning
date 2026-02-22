@@ -7,26 +7,30 @@ import numpy as np
 
 def left_child_add_prefix(text):
     """
-    Adds prefix for left child branches.
-    Uses '  +---> ' for the first line and '  | ' for subsequent lines.
+    Adds prefix for a child that is NOT the last child.
+    The pipe '|' must continue down to connect to the next sibling.
     """
     lines = text.splitlines()
-    new_text = "  +---> " + lines[0] + "\n"
+    # First line gets the branch arrow
+    new_text = "+---> " + lines[0] + "\n"
+    # Following lines get a vertical pipe to continue the line
     for line in lines[1:]:
-        new_text += "  | " + line + "\n"
-    return (new_text)
+        new_text += "| " + line + "\n"
+    return new_text
 
 
 def right_child_add_prefix(text):
     """
-    Adds prefix for right child branches.
-    Uses '  +---> ' for the first line and '    ' for subsequent lines.
+    Adds prefix for the LAST child of a node.
+    No pipe is needed below this branch.
     """
     lines = text.splitlines()
-    new_text = "  +---> " + lines[0] + "\n"
+    # First line gets the branch arrow
+    new_text = "+---> " + lines[0] + "\n"
+    # Following lines get empty spaces
     for line in lines[1:]:
-        new_text += "    " + line + "\n"
-    return (new_text)
+        new_text += "  " + line + "\n"
+    return new_text
 
 
 class Node:
@@ -58,14 +62,12 @@ class Node:
         return 1 + left_count + right_count
 
     def __str__(self):
-        """Returns string representation of the node and its children"""
+        """Returns string representation matching the checker's format"""
         if self.is_root:
             out = f"root [feature={self.feature}, threshold={self.threshold}]\n"
         else:
-            out = (f"node [feature={self.feature}, "
-                   f"threshold={self.threshold}]\n")
+            out = f"node [feature={self.feature}, threshold={self.threshold}]\n"
 
-        # Recursively call __str__ on children and apply prefixes
         out += left_child_add_prefix(self.left_child.__str__())
         out += right_child_add_prefix(self.right_child.__str__())
 
@@ -89,7 +91,7 @@ class Leaf(Node):
         return 1
 
     def __str__(self):
-        """Returns string representation of the leaf"""
+        """Leaf string without extra arrows (arrows added by prefix)"""
         return f"leaf [value={self.value}]"
 
 
