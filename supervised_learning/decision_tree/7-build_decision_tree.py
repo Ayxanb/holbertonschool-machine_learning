@@ -97,28 +97,75 @@ class Node:
 
 
 class Leaf(Node):
-    """Leaf node class."""
+    """
+    Represents a leaf node in a decision tree.
+    """
     def __init__(self, value, depth=None):
+        """
+        Initializes a leaf node.
+
+        Args:
+            value: The predicted class or value for this leaf.
+            depth: The depth level of the leaf within the tree.
+        """
         super().__init__()
         self.value, self.is_leaf, self.depth = value, True, depth
 
     def max_depth_below(self):
-        """Finds max depth recursively."""
+        """
+        Returns the depth of the leaf as the base case for recursion.
+
+        Returns:
+            int: The depth of this leaf.
+        """
         return self.depth
 
     def count_nodes_below(self, only_leaves=False):
+        """
+        Counts this leaf for the tree node summation.
+
+        Args:
+            only_leaves (bool): If True, counts only leaves.
+
+        Returns:
+            int: 1, representing this single leaf.
+        """
         return 1
 
     def get_leaves_below(self):
+        """
+        Returns a list containing only this leaf.
+
+        Returns:
+            list: A list containing the current Leaf instance.
+        """
         return [self]
 
     def update_bounds_below(self):
+        """
+        Base case for bound updates; leaves have no children to update.
+        """
         pass
 
     def pred(self, x):
+        """
+        Returns the prediction value for a given individual.
+
+        Args:
+            x (numpy.ndarray): A 1D array representing a single individual.
+
+        Returns:
+            The value stored in the leaf.
+        """
         return self.value
 
     def __str__(self):
+        """
+        Returns the string representation of the leaf.
+
+        Returns:
+            str: Formatted string indicating leaf value.
+        """
         return f"-> leaf [value={self.value}]"
 
 
