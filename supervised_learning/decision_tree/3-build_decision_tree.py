@@ -72,9 +72,11 @@ class Node:
     def __str__(self):
         """Returns string representation matching the checker's format"""
         if self.is_root:
-            out = f"root [feature={self.feature}, threshold={self.threshold}]\n"
+            out = \
+                f"root [feature={self.feature}, threshold={self.threshold}]\n"
         else:
-            out = f"node [feature={self.feature}, threshold={self.threshold}]\n"
+            out = \
+                f"node [feature={self.feature}, threshold={self.threshold}]\n"
 
         out += left_child_add_prefix(self.left_child.__str__())
         out += right_child_add_prefix(self.right_child.__str__())
