@@ -315,6 +315,96 @@ class Decision_Tree():
         n.sub_population = sub_population
         return n
 
+    def fit(self, explanatory, target, verbose=0):
+        """
+        Trains the decision tree using the specified split criterion.
+        """
+        if self.split_criterion == "random":
+            self.split_criterion = self.random_split_criterion
+        else:
+            # Gini_split_criterion to be defined in future tasks
+            self.split_criterion = self.Gini_split_criterion
+
+        self.explanatory = explanatory
+        self.target = target
+        self.root.sub_population = np.ones_like(self.target, dtype='bool')
+
+        self.fit_node(self.root)
+        self.update_predict()
+
+        if verbose == 1:
+            print(f"  Training finished.\n"
+                  f"- Depth                     : {self.depth()}\n"
+                  f"- Number of nodes           : {self.count_nodes()}\n"
+                  f"- Number of leaves          : "
+                  f"{self.count_nodes(only_leaves=True)}\n"
+                  f"- Accuracy on training data : "
+                  f"{self.accuracy(self.explanatory, self.target)}")
+
+    def fit_node(self, node):
+        """
+        Recursively splits the node until leaf conditions are met.
+        """
+        # Determine if current node targets are pure
+        node_targets = self.target[node.sub_population]
+
+        # Stop conditions: max depth, min population, or pure node
+        if (node.depth >= self.max_depth or
+                len(node_targets) <= self.min_pop or
+                np.unique(node_targets).size == 1):
+            # This node is handled by parent as a leaf already
+            return
+
+        node.feature, node.threshold = self.split_criterion(node)
+
+        # Splitting logic: Left (> threshold), Right (<= threshold)
+        left_mask = self.explanatory[:, node.feature] > node.threshold
+        right_mask = self.explanatory[:, node.feature] <= node.threshold
+
+        left_pop = np.logical_and(node.sub_population, left_mask)
+        right_pop = np.logical_and(node.sub_population, right_mask)
+
+        # Handle Left Child
+        if (np.sum(left_pop) <= self.min_pop or
+                node.depth + 1 >= self.max_depth or
+                np.unique(self.target[left_pop]).size == 1):
+            node.left_child = self.get_leaf_child(node, left_pop)
+        else:
+            node.left_child = self.get_node_child(node, left_pop)
+            self.fit_node(node.left_child)
+
+        # Handle Right Child
+        if (np.sum(right_pop) <= self.min_pop or
+                node.depth + 1 >= self.max_depth or
+                np.unique(self.target[right_pop]).size == 1):
+            node.right_child = self.get_leaf_child(node, right_pop)
+        else:
+            node.right_child = self.get_node_child(node, right_pop)
+            self.fit_node(node.right_child)
+
+    def get_leaf_child(self, node, sub_population):
+        """Creates and returns a Leaf child."""
+        # Find majority class
+        targets = self.target[sub_population]
+        value = np.bincount(targets).argmax()
+
+        leaf_child = Leaf(value)
+        leaf_child.depth = node.depth + 1
+        leaf_child.sub_population = sub_population
+        return leaf_child
+
+    def get_node_child(self, node, sub_population):
+        """Creates and returns an internal Node child."""
+        n = Node()
+        n.depth = node.depth + 1
+        n.sub_population = sub_population
+        return n
+
+    def accuracy(self, test_explanatory, test_target):
+        """Calculates accuracy on a given dataset."""
+        return np.sum(np.equal(self.predict(test_explanatory),
+                               test_target)) / test_target.size
+
     def __str__(self):
         """Entry point for tree string representation"""
         return self.root.__str__()
