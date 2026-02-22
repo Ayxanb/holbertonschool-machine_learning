@@ -1,30 +1,34 @@
 #!/usr/bin/env python3
 """
-Decision Tree printing module.
+Decision Tree module with precise string formatting.
 """
 import numpy as np
 
 
 def left_child_add_prefix(text):
-    """Adds prefix for left child with vertical bar for alignment."""
+    """Adds prefixes for left children with vertical bars."""
     lines = text.splitlines()
+    # First line gets the arrow
     new_text = "    +---> " + lines[0] + "\n"
+    # Subsequent lines get the bar aligned under the '+'
     for line in lines[1:]:
-        new_text += "    |      " + line + "\n"
+        new_text += "    |     " + line + "\n"
     return new_text
 
 
 def right_child_add_prefix(text):
-    """Adds prefix for right child (last child) with empty space."""
+    """Adds prefixes for right children with empty space."""
     lines = text.splitlines()
+    # First line gets the arrow
     new_text = "    +---> " + lines[0] + "\n"
+    # Subsequent lines get empty space
     for line in lines[1:]:
-        new_text += "           " + line + "\n"
+        new_text += "          " + line + "\n"
     return new_text
 
 
 class Node:
-    """Internal node of the tree."""
+    """Node class for Decision Tree."""
     def __init__(self, feature=None, threshold=None, left_child=None,
                  right_child=None, is_root=False, depth=0):
         self.feature = feature
@@ -38,24 +42,27 @@ class Node:
     def __str__(self):
         """Recursive string representation."""
         label = "root" if self.is_root else "node"
-        
-        # Handle threshold formatting to match expected output
+
+        # Match threshold formatting (30000.0 -> 30000)
         t = self.threshold
-        t_str = str(int(t)) if isinstance(t, (int, float)) and t == int(t) \
-            else str(t)
-            
+        if isinstance(t, (int, float)) and t == int(t):
+            t_str = str(int(t))
+        else:
+            t_str = str(t)
+
         out = f"{label} [feature={self.feature}, threshold={t_str}]\n"
-        
-        if self.left_child:
+
+        if self.left_child is not None:
             out += left_child_add_prefix(self.left_child.__str__())
-        if self.right_child:
+
+        if self.right_child is not None:
             out += right_child_add_prefix(self.right_child.__str__())
-            
+
         return out.rstrip("\n")
 
 
 class Leaf(Node):
-    """Leaf node of the tree."""
+    """Leaf class for Decision Tree."""
     def __init__(self, value, depth=None):
         super().__init__()
         self.value = value
@@ -63,15 +70,15 @@ class Leaf(Node):
         self.depth = depth
 
     def __str__(self):
-        """String representation of a leaf."""
+        """Returns the leaf string label."""
         return f"leaf [value={self.value}]"
 
 
 class Decision_Tree:
-    """Decision tree model container."""
+    """Decision Tree class wrapper."""
     def __init__(self, root=None):
         self.root = root
 
     def __str__(self):
-        """Entry point for printing."""
+        """Returns the string of the root node."""
         return self.root.__str__()
