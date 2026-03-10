@@ -15,7 +15,7 @@ class NeuralNetwork:
 
     def __init__(self, nx, nodes):
         """
-        Initializes the neural network
+        Initializes the NeuralNetwork class.
 
         Args:
             nx: number of input features
