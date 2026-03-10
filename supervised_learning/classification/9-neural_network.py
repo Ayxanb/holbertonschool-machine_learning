@@ -34,25 +34,19 @@ class NeuralNetwork:
         if nodes < 1:
             raise ValueError("nodes must be a positive integer")
 
-        # __W1: Weights for hidden layer. Shape (nodes, nx)
         # Allows each hidden node to process every input feature.
         self.__W1 = np.random.normal(size=(nodes, nx))
 
-        # __b1: Biases for hidden layer. Shape (nodes, 1)
         # Column vector added to the hidden layer's linear product.
         self.__b1 = np.zeros((nodes, 1))
 
         # __A1: Activated output for hidden layer.
         self.__A1 = 0
 
-        # __W2: Weights for output layer. Shape (1, nodes)
         # Allows the output node to process every hidden layer output.
         self.__W2 = np.random.normal(size=(1, nodes))
 
-        # __b2: Bias for output neuron. Scalar.
         self.__b2 = 0
-
-        # __A2: Activated output (prediction).
         self.__A2 = 0
 
     @property
