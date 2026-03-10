@@ -5,7 +5,7 @@ import numpy as np
 This module contains the `NeuralNetwork` class.
 """
 
-    
+
 class NeuralNetwork:
     """
     Defines a neural network with one hidden layer
