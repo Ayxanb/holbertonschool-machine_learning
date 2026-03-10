@@ -40,18 +40,15 @@ class DeepNeuralNetwork:
             if not isinstance(layers[i], int) or layers[i] <= 0:
                 raise TypeError("layers must be a list of positive integers")
 
-            # Determine the input size for the current layer
             # i=0 takes input nx, otherwise it takes the previous layer size
             prev_size = nx if i == 0 else layers[i - 1]
 
-            # He et al. initialization
             # W = random * sqrt(2 / input_size)
             self.__weights[f"W{i + 1}"] = (
                 np.random.randn(layers[i], prev_size) *
                 np.sqrt(2 / prev_size)
             )
 
-            # Biases initialized to zeros
             self.__weights[f"b{i + 1}"] = np.zeros((layers[i], 1))
 
     @property
