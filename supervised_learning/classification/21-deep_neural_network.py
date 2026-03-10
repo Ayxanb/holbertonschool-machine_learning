@@ -87,7 +87,6 @@ class DeepNeuralNetwork:
 
             if i > 1:
                 # Derivative of sigmoid: A * (1 - A)
-                # Used to calculate the gradient for the next layer back
                 dz = np.dot(w_curr.T, dz) * (a_prev * (1 - a_prev))
 
             self.__weights[f"W{i}"] = self.__weights[f"W{i}"] - (alpha * dw)
