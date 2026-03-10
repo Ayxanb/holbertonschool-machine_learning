@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-import numpy as np
 
 """
-This module contains definition of `NeuralNetwork` class.
+This module defines a neural network with one hidden layer.
+It includes initialization of weights, biases, and private attributes
+for binary classification.
 """
+import numpy as np
 
 
 class NeuralNetwork:
