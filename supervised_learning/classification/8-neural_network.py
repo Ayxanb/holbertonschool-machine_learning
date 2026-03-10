@@ -2,7 +2,8 @@
 import numpy as np
 
 """
-This module contains the `NeuralNetwork` class.
+This module contains the `NeuralNetwork` class,
+comninations of Neurons.
 """
 
 
