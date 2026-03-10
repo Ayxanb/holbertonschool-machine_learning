@@ -8,15 +8,31 @@ This module contains definition of `NeuralNetwork` class.
 
 class NeuralNetwork:
     """
-    Defines a neural network with one hidden layer
-    performing binary classification with private attributes
+    Defines a neural network with one hidden layer performing binary
+    classification.
+
+    Attributes:
+        W1 (numpy.ndarray): The weights vector for the hidden layer.
+        b1 (numpy.ndarray): The bias for the hidden layer.
+        A1 (float): The activated output for the hidden layer.
+        W2 (numpy.ndarray): The weights vector for the output neuron.
+        b2 (int): The bias for the output neuron.
+        A2 (float): The activated output for the output neuron.
     """
 
     def __init__(self, nx, nodes):
         """
-        Initializes the neural network
-        nx: number of input features
-        nodes: number of nodes in the hidden layer
+        Class constructor to initialize the neural network.
+
+        Args:
+            nx (int): The number of input features to the neuron.
+            nodes (int): The number of nodes found in the hidden layer.
+
+        Raises:
+            TypeError: If nx is not an integer.
+            ValueError: If nx is less than 1.
+            TypeError: If nodes is not an integer.
+            ValueError: If nodes is less than 1.
         """
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
@@ -36,30 +52,54 @@ class NeuralNetwork:
 
     @property
     def W1(self):
-        """Getter for weights of the hidden layer"""
+        """
+        Getter for the weights vector of the hidden layer.
+        Returns:
+            numpy.ndarray: Random normal distribution of shape (nodes, nx).
+        """
         return self.__W1
 
     @property
     def b1(self):
-        """Getter for bias of the hidden layer"""
+        """
+        Getter for the bias of the hidden layer.
+        Returns:
+            numpy.ndarray: Zeros of shape (nodes, 1).
+        """
         return self.__b1
 
     @property
     def A1(self):
-        """Getter for activation of the hidden layer"""
+        """
+        Getter for the activated output of the hidden layer.
+        Returns:
+            The current activation value (initially 0).
+        """
         return self.__A1
 
     @property
     def W2(self):
-        """Getter for weights of the output neuron"""
+        """
+        Getter for the weights vector of the output neuron.
+        Returns:
+            numpy.ndarray: Random normal distribution of shape (1, nodes).
+        """
         return self.__W2
 
     @property
     def b2(self):
-        """Getter for bias of the output neuron"""
+        """
+        Getter for the bias of the output neuron.
+        Returns:
+            int: The current bias value (initially 0).
+        """
         return self.__b2
 
     @property
     def A2(self):
-        """Getter for activation of the output neuron"""
+        """
+        Getter for the activated output of the output neuron.
+        Returns:
+            The current prediction value (initially 0).
+        """
         return self.__A2
