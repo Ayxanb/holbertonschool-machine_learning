@@ -13,16 +13,16 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
 
     Args:
         nx (int): The number of input features to the network.
-        layers (list): A list of integers representing the number of nodes 
+        layers (list): A list of integers representing the number of nodes
             in each layer of the network.
-        activations (list): A list of strings representing the activation 
+        activations (list): A list of strings representing the activation
             functions to be used for each layer.
         lambtha (float): The L2 regularization parameter (weight decay).
-        keep_prob (float): The probability that a node will be kept 
+        keep_prob (float): The probability that a node will be kept
             during Dropout.
 
     Returns:
-        keras.Model: A Keras Sequential model instance configured with the 
+        keras.Model: A Keras Sequential model instance configured with the
         specified architecture, regularization, and dropout settings.
     """
 
@@ -50,7 +50,7 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
 
         if i < len(layers) - 1:
             """
-            Apply Dropout to all hidden layers. The dropout rate is 
+            Apply Dropout to all hidden layers. The dropout rate is
             calculated as (1 - keep_prob) to match Keras specifications.
             """
             model.add(K.layers.Dropout(1 - keep_prob))
