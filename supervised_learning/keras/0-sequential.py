@@ -32,7 +32,7 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
     for i in range(len(layers)):
         """
         Iterate through the layers list to construct the network architecture.
-        The first layer is specifically assigned the input_shape derived from nx.
+        First layer is specifically assigned the input_shape derived from nx.
         """
         if i == 0:
             model.add(K.layers.Dense(
