@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This module contains a function to test a Keras model 
+This module contains a function to test a Keras model
 on a specific dataset.
 """
 import tensorflow.keras as K
