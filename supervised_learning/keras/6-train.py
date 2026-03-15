@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 This module contains a function to train a Keras model
-using mini-batch gradient descent with optional validation 
+using mini-batch gradient descent with optional validation
 and early stopping.
 """
 import tensorflow.keras as K
