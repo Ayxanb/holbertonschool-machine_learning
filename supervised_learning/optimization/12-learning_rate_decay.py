@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Sets up inverse time learning rate decay in TensorFlow 2.x.
+Sets up inverse time learning rate decay in tensorflow.
 """
 import tensorflow as tf
 
 
 def learning_rate_decay(alpha, decay_rate, decay_step):
     """
-    Creates a learning rate decay operation in TensorFlow using 
+    Creates a learning rate decay operation in TensorFlow using
     inverse time decay.
 
     Args:

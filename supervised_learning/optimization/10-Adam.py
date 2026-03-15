@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Sets up the Adam optimization algorithm in TensorFlow 2.x.
+Sets up the Adam optimization algorithm in tensorflow.
 """
 import tensorflow as tf
 
 
 def create_Adam_op(alpha, beta1, beta2, epsilon):
     """
-    Sets up the Adam optimization algorithm in TensorFlow 2.x.
+    Sets up the Adam optimization algorithm in tensorflow.
 
     Args:
         alpha: The learning rate.
