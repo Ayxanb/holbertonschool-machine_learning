@@ -1,4 +1,12 @@
+#!/usr/bin/env python3
 import numpy as np
+
+"""
+This module provides utility functions for data preprocessing in machine learning.
+Specifically, it contains a function to convert numeric label vectors into 
+one-hot matrices for multi-class classification tasks.
+"""
+
 
 def one_hot_encode(Y, classes):
     """
