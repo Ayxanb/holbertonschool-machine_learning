@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-This module contains a function to set up Adam optimization 
+This module contains a function to set up Adam optimization
 for a Keras model using categorical crossentropy.
 """
 
