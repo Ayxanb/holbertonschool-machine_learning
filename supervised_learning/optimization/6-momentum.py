@@ -2,7 +2,7 @@
 """
 Sets up the Momentum optimization algorithm.
 """
-import tensorflow.keras as K
+import tensorflow as tf
 
 
 def create_momentum_op(alpha, beta1):
@@ -16,7 +16,7 @@ def create_momentum_op(alpha, beta1):
     Returns:
         The optimizer object.
     """
-    return K.optimizers.SGD(
+    return tf.keras.optimizers.SGD(
             learning_rate=alpha,
             momentum=beta1
     )
