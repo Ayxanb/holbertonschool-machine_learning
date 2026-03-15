@@ -40,5 +40,5 @@ def create_batch_norm_layer(prev, n, activation):
     # 3. Apply Activation
     if activation is None:
         return Z_norm
- 
+
     return activation(Z_norm)
