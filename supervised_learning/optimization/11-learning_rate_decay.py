@@ -21,8 +21,8 @@ def learning_rate_decay(alpha, decay_rate, global_step, decay_step):
     # Use floor division to create the "staircase" or stepwise effect
     # The decay only updates every 'decay_step' iterations
     num_decays = global_step // decay_step
-    
+
     # Calculate the inverse time decay
     alpha_new = alpha / (1 + decay_rate * num_decays)
-    
+
     return alpha_new
