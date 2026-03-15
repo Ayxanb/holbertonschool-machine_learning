@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Sets up the Momentum optimization algorithm in TensorFlow 2.x.
+Sets up the Momentum optimization algorithm.
 """
-import tensorflow as tf
+import tensorflow.keras as K
 
 
 def create_momentum_op(alpha, beta1):
     """
-    Sets up the gradient descent with momentum optimization 
-    algorithm in TensorFlow 2.x.
+    Sets up the gradient descent with momentum optimization algorithm.
 
     Args:
         alpha: The learning rate.
@@ -17,11 +16,7 @@ def create_momentum_op(alpha, beta1):
     Returns:
         The optimizer object.
     """
-    # In TF 2.x, momentum is part of the SGD (Stochastic Gradient Descent) 
-    # optimizer class.
-    optimizer = tf.keras.optimizers.SGD(
-        learning_rate=alpha,
-        momentum=beta1
+    return K.optimizers.SGD(
+            learning_rate=alpha,
+            momentum=beta1
     )
-
-    return optimizer
