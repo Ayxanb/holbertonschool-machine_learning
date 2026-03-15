@@ -2,8 +2,8 @@
 import numpy as np
 
 """
-This module provides utility functions for data preprocessing in machine learning.
-Specifically, it contains a function to convert numeric label vectors into 
+This module provides utility functions for data preprocessing in ML.
+Specifically, it contains a function to convert numeric label vectors into
 one-hot matrices for multi-class classification tasks.
 """
 
