@@ -8,14 +8,15 @@ import tensorflow.keras as K
 
 
 def train_model(network, data, labels, batch_size,
-        epochs, verbose=True, shuffle=False):
+                epochs, verbose=True, shuffle=False):
     """
     Trains a model using mini-batch gradient descent.
 
     Args:
         network: the model to train
         data: numpy.ndarray of shape (m, nx) containing the input data
-        labels: one-hot numpy.ndarray of shape (m, classes) containing the labels
+        labels: one-hot numpy.ndarray of shape (m, classes)
+                containing the labels
         batch_size: size of the batch used for mini-batch gradient descent
         epochs: number of passes through data
         verbose: boolean determining if output should be printed
