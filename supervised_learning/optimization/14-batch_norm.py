@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sets up a Batch Normalization layer in tensorFlow.
+Sets up a Batch Normalization layer in TensorFlow 2.x.
 """
 import tensorflow as tf
 
@@ -17,31 +17,32 @@ def create_batch_norm_layer(prev, n, activation):
     Returns:
         A tensor of the activated output for the layer.
     """
-    # 1. Base Dense Layer (Linear Transformation)
-    # We use VarianceScaling(mode='fan_avg') as requested.
-    # Note: use_bias=False is common when using Batch Norm because
-    # the 'beta' parameter in BN acts as the bias.
+    # 1. Base Dense Layer
+    # Initialize with VarianceScaling(mode='fan_avg')
     init = tf.keras.initializers.VarianceScaling(mode='fan_avg')
-    dense_layer = tf.keras.layers.Dense(
+    
+    # We create the layer and IMMEDIATELY call it on 'prev' to get Z
+    dense = tf.keras.layers.Dense(
         units=n,
         kernel_initializer=init,
         use_bias=False
     )
-    Z = dense_layer(prev)
+    Z = dense(prev)
 
     # 2. Batch Normalization Layer
-    # gamma_initializer='ones' and beta_initializer='zeros' are defaults,
-    # but we specify them here for clarity.
-    batch_norm = tf.keras.layers.BatchNormalization(
+    # Create the layer object
+    bn_layer = tf.keras.layers.BatchNormalization(
+        epsilon=1e-7,
         beta_initializer='zeros',
-        gamma_initializer='ones',
-        epsilon=1e-7
+        gamma_initializer='ones'
     )
-    Z_norm = batch_norm(Z)
+    
+    # IMPORTANT: Call the BN layer on the linear output Z
+    # This applies the normalization, scaling (gamma), and shifting (beta)
+    Z_norm = bn_layer(Z)
 
     # 3. Apply Activation
-    # If activation is None, it returns the normalized linear output.
     if activation is None:
         return Z_norm
-
+    
     return activation(Z_norm)
