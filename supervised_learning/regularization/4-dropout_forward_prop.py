@@ -41,7 +41,8 @@ def dropout_forward_prop(X, weights, L, keep_prob):
 
             # Create Dropout Mask
             # Random values between 0 and 1; True if < keep_prob
-            mask = (np.random.rand(A.shape[0], A.shape[1]) < keep_prob).astype(int)
+            mask = (np.random.rand(A.shape[0],
+                    A.shape[1]) < keep_prob).astype(int)
 
             # Apply mask and scale (Inverted Dropout)
             A *= mask
