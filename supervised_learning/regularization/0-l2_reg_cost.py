@@ -24,7 +24,6 @@ def l2_reg_cost(cost, lambtha, weights, L, m):
     # Initialize the sum of squared weights
     squared_weights_sum = 0
 
-    # Iterate through the layers to sum the Frobenius norm of each weight matrix
     for i in range(1, L + 1):
         key = 'W' + str(i)
         # We only regularize weights (W), not biases (b)
