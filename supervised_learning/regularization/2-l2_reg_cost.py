@@ -21,5 +21,5 @@ def l2_reg_cost(cost, model):
     # Keras models store regularization losses in the 'losses' attribute
     # We add the base cost to the sum of these regularization penalties
     total_cost = cost + model.losses
-    
+
     return total_cost
