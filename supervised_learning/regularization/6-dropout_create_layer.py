@@ -3,7 +3,7 @@
 This module contains a function to create a Keras layer
 incorporating dropout regularization.
 """
-import tensorflow.keras as K
+import tensorflow as tf
 
 
 def dropout_create_layer(prev, n, activation, keep_prob, training=True):
@@ -21,7 +21,7 @@ def dropout_create_layer(prev, n, activation, keep_prob, training=True):
         The output tensor of the new layer.
     """
     # Initialize the Dense layer
-    dense_layer = K.layers.Dense(
+    dense_layer = tf.keras.layers.Dense(
         units=n,
         activation=activation,
         kernel_initializer=K.initializers.VarianceScaling(
@@ -33,7 +33,7 @@ def dropout_create_layer(prev, n, activation, keep_prob, training=True):
     x = dense_layer(prev)
 
     # Define the Dropout layer. Note: rate = 1 - keep_prob
-    dropout_layer = K.layers.Dropout(rate=1 - keep_prob)
+    dropout_layer = tf.keras.layers.Dropout(rate=1 - keep_prob)
 
     # Apply dropout to the output of the dense layer
     # The 'training' argument ensures dropout is only active during training
