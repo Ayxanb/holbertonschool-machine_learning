@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This module contains a function to create a Keras layer 
+This module contains a function to create a Keras layer
 incorporating dropout regularization.
 """
 import tensorflow as tf
