@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 This module contains a function to create a Keras layer
-incorporating dropout regularization.
+incorporating dropout regularization using the tf import.
 """
 import tensorflow as tf
 
@@ -21,20 +21,23 @@ def dropout_create_layer(prev, n, activation, keep_prob, training=True):
         The output tensor of the new layer.
     """
     # Initialize the Dense layer
+    # We use VarianceScaling (He et al.) as a standard robust initializer
+    init = tf.keras.initializers.VarianceScaling(scale=2.0, mode='fan_avg')
+
     dense_layer = tf.keras.layers.Dense(
         units=n,
         activation=activation,
-        kernel_initializer=K.initializers.VarianceScaling(
-            scale=2.0, mode='fan_avg', distribution='normal'
-        )
+        kernel_initializer=init
     )
 
     # Pass the previous output through the dense layer
     x = dense_layer(prev)
 
-    # Define the Dropout layer. Note: rate = 1 - keep_prob
-    dropout_layer = tf.keras.layers.Dropout(rate=1 - keep_prob)
+    # Define the Dropout layer. 
+    # TensorFlow uses 'rate' (probability of dropping)
+    rate = 1 - keep_prob
+    dropout_layer = tf.keras.layers.Dropout(rate=rate)
 
     # Apply dropout to the output of the dense layer
-    # The 'training' argument ensures dropout is only active during training
+    # The 'training' argument is vital for switching behavior during inference
     return dropout_layer(x, training=training)
