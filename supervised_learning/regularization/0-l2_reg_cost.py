@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This module contains a function to calculate the cost of a 
+This module contains a function to calculate the cost of a
 neural network with L2 regularization included.
 """
 import numpy as np
