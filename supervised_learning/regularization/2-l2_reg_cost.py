@@ -3,7 +3,7 @@
 This module contains a function to calculate the total cost
 of a Keras model including L2 regularization.
 """
-import tensorflow.keras as K
+import tensorflow as tf
 
 
 def l2_reg_cost(cost, model):
