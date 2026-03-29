@@ -25,15 +25,15 @@ def convolve_grayscale_valid(images, kernel):
 
     # Extract dimensions: number of images, height, and width
     m, h, w = images.shape
-    
+
     # Extract kernel dimensions: height and width
     kh, kw = kernel.shape
-    
+
     # Calculate output dimensions for 'valid' convolution (no padding)
     # The kernel must fit entirely within the image boundaries
     out_h = h - kh + 1
     out_w = w - kw + 1
-    
+
     # Initialize the output tensor with zeros
     output = np.zeros((m, out_h, out_w))
 
@@ -41,12 +41,12 @@ def convolve_grayscale_valid(images, kernel):
     # we loop over every 'weight' in the kernel.
     for ky in range(kh):
         for kx in range(kw):
-            # images[:, ky:ky + out_h, kx:kx + out_w] extracts a 'slice' of 
-            # the entire batch of images that corresponds to the current 
+            # images[:, ky:ky + out_h, kx:kx + out_w] extracts a 'slice' of
+            # the entire batch of images that corresponds to the current
             # kernel element (ky, kx).
-            
+
             # We multiply this entire 3D slice by a single scalar (the kernel weight)
             # and add it to the running total in the output array.
             output += images[:, ky:ky + out_h, kx:kx + out_w] * kernel[ky, kx]
-            
+
     return output
