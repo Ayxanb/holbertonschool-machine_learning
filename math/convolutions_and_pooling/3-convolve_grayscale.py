@@ -70,7 +70,7 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
                            mode='constant', constant_values=0)
 
     # --- 3. Calculate Output Dimensions ---
-    # The output size is the number of times the kernel 'fits' into the 
+    # The output size is the number of times the kernel 'fits' into the
     # padded image while jumping by the stride.
     out_h = (h + 2 * pad_h - kh) // sh + 1
     out_w = (w + 2 * pad_w - kw) // sw + 1
