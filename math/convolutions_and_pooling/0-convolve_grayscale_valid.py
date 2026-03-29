@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 """
-This module contains `convolve_grayscale_valid` — a simple valid convolution
+This module contains `convolve_grayscale_valid`  a simple valid convolution
 implementation for grayscale images (used for learning CNN basics).
 """
 
@@ -22,11 +22,16 @@ def convolve_grayscale_valid(images, kernel):
     numpy.ndarray, shape (m, out_h, out_w)
         Convolved images using valid mode (no padding).
     """
+
+    # image count, height and width of each image
     m, h, w = images.shape
+    # kernel height and width
     kh, kw = kernel.shape
+    # out array height and width
     out_h = h - kh + 1
     out_w = w - kw + 1
     output = np.zeros((m, out_h, out_w))
+
     for ky in range(kh):
         for kx in range(kw):
             output += images[:, ky:ky + out_h, kx:kx + out_w] * kernel[ky, kx]
