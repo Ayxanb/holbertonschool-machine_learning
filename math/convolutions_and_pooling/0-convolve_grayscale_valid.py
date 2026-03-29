@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import numpy as np
 """
-This module contains `convolve_grayscale_valid` a simple "valid" convolution
-implementation for grayscale images (used for learning CNN basics).
+This module contains `convolve_grayscale_valid`
+a simple "valid" convolution implementation
+for grayscale images (used for learning CNN basics).
 """
 
 
