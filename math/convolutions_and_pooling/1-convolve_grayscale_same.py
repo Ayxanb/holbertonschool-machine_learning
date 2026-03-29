@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
 """
-This module contains the function `convolve_grayscale_same`.
-It performs a "same" convolution on a batch of grayscale images.
+This module contains the function `convolve_grayscale_padding`.
+It implements a convolution for grayscale images using custom
+zero-padding provided by the user.
 """
 import numpy as np
 
 
-def convolve_grayscale_same(images, kernel):
+def convolve_grayscale_padding(images, kernel, padding):
     """
-    Performs a 'same' convolution on a batch of grayscale images.
+    Performs a convolution on a batch of grayscale images with custom padding.
 
-    A 'same' convolution ensures that the output spatial dimensions
-    (height and width) are identical to the input spatial dimensions.
-    This is achieved by padding the input images with zeros.
-
-    This function utilizes a highly optimized vectorized approach.
-    Instead of iterating over every pixel in every image, it iterates
-    over the dimensions of the kernel. For each kernel weight, it
-    multiplies a shifted slice of the entire image batch, accumulating
-    the results into the output array.
+    This function applies a convolution kernel to a batch of images after
+    applying zero-padding to the spatial dimensions. The operation is
+    optimized using NumPy broadcasting by iterating over the kernel's
+    spatial dimensions rather than the output's pixels.
 
     Parameters
     ----------
@@ -31,45 +27,54 @@ def convolve_grayscale_same(images, kernel):
         A 2D array of shape (kh, kw) containing the convolution filter.
         kh : The height of the kernel.
         kw : The width of the kernel.
+    padding : tuple
+        A tuple of (ph, pw) representing the padding for the height
+        and width, respectively. ph rows are added to the top and bottom,
+        and pw columns are added to the left and right.
 
     Returns
     -------
     numpy.ndarray
-        A 3D array of shape (m, h, w) containing the convolved images.
-        The output size matches the input size regardless of kernel size.
+        A 3D array of shape (m, out_h, out_w) containing the convolved
+        images. The output dimensions are:
+        out_h = h + (2 * ph) - kh + 1
+        out_w = w + (2 * pw) - kw + 1
     """
-    # m: batch size, h: original height, w: original width
+    # m: batch size, h: image height, w: image width
     m, h, w = images.shape
     # kh: kernel height, kw: kernel width
     kh, kw = kernel.shape
+    # ph: height padding, pw: width padding
+    ph, pw = padding
 
-    # Calculate symmetric padding for 'same' convolution.
-    # ph/pw represent the number of pixels added to each side.
-    # Example: A 3x3 kernel (kh=3) results in ph = 3 // 2 = 1 pixel
-    # of padding on the top and 1 on the bottom.
-    ph = kh // 2
-    pw = kw // 2
+    # Apply symmetric zero-padding to the height and width dimensions.
+    # The batch dimension (axis 0) remains unpadded.
+    # Resulting shape: (m, h + 2*ph, w + 2*pw)
+    padded = np.pad(
+        images,
+        ((0, 0), (ph, ph), (pw, pw)),
+        mode='constant',
+        constant_values=0
+    )
 
-    # Apply zero padding to the height (axis 1) and width (axis 2).
-    # The batch (axis 0) is left unpadded.
-    # padded shape: (m, h + 2*ph, w + 2*pw)
-    padded = np.pad(images, ((0, 0), (ph, ph), (pw, pw)),
-                    mode='constant', constant_values=0)
+    # Calculate the resulting output dimensions.
+    # These represent how many times the kernel can fit spatially.
+    out_h = h + 2 * ph - kh + 1
+    out_w = w + 2 * pw - kw + 1
 
-    # Initialize the output tensor with the same spatial shape as the input.
-    convolved = np.zeros((m, h, w))
+    # Initialize the output tensor.
+    output = np.zeros((m, out_h, out_w))
 
-    # Loop through the kernel height and width.
-    # We use exactly two loops as required by the constraint.
-    for i in range(kh):
-        for j in range(kw):
-            # Extract a slice of the padded images starting at (i, j).
-            # Each slice is exactly the size of the original image (h, w).
-            # By iterating i and j, we effectively 'slide' the image
-            # under the kernel.
+    # Perform convolution by iterating over the kernel's spatial dimensions.
+    # This method treats the convolution as a weighted sum of shifted images.
+    for ky in range(kh):
+        for kx in range(kw):
+            # Extract a slice of the padded batch that is offset by the
+            # current kernel coordinates (ky, kx).
+            # Each slice has the spatial shape (out_h, out_w).
 
-            # This line performs the multiplication for all 'm' images
-            # and all pixels simultaneously using NumPy broadcasting.
-            convolved += padded[:, i:i + h, j:j + w] * kernel[i, j]
+            # The slice is multiplied by the specific scalar weight at
+            # kernel[ky, kx] and accumulated into the output.
+            output += padded[:, ky:ky + out_h, kx:kx + out_w] * kernel[ky, kx]
 
-    return convolved
+    return output
