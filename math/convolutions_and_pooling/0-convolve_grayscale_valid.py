@@ -45,7 +45,7 @@ def convolve_grayscale_valid(images, kernel):
             # the entire batch of images that corresponds to the current
             # kernel element (ky, kx).
 
-            # We multiply this entire 3D slice by a single scalar (the kernel weight)
+            # We multiply this entire 3D slice by a single scalar
             # and add it to the running total in the output array.
             output += images[:, ky:ky + out_h, kx:kx + out_w] * kernel[ky, kx]
 
