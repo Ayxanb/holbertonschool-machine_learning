@@ -1,42 +1,37 @@
 #!/usr/bin/env python3
 """
-This module contains the function `convolve_grayscale`.
-It provides a flexible convolution implementation capable of handling
-various padding schemes and strides for grayscale image batches.
+This module contains the function `convolve_channels`.
+It performs a multi-channel convolution on a batch of images.
 """
 import numpy as np
 
 
-def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
+def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
     """
-    Performs a convolution on a batch of grayscale images.
+    Performs a convolution on a batch of images with multiple channels.
 
-    This function utilizes a window-based approach to accommodate strides
-    greater than 1. While looping over the output spatial dimensions (i, j),
-    it leverages NumPy's broadcasting to process the entire batch of 'm'
-    images in a single operation per window.
-
-    Mathematical Logic:
-    - Padding: Zeroes are added to ensure the kernel can traverse the image.
-    - Stride: Controls the step size of the kernel. A stride of 2 halves
-      the output resolution.
-    - Vectorization: The multiplication and summation occur across the
-      entire batch (axis 0) simultaneously.
+    This function processes a batch of images (m, h, w, c) using a 3D
+    kernel (kh, kw, c). It uses a window-based approach to handle
+    strides and utilizes NumPy's broadcasting to perform the element-wise
+    multiplication and summation across all images and channels
+    simultaneously.
 
     Parameters
     ----------
     images : numpy.ndarray
-        A 3D array of shape (m, h, w) containing the image batch.
+        A 4D array of shape (m, h, w, c) containing the image batch.
         m : The number of images.
         h : The height of each image in pixels.
         w : The width of each image in pixels.
+        c : The number of channels in the image.
     kernel : numpy.ndarray
-        A 2D array of shape (kh, kw) containing the convolution filter.
+        A 3D array of shape (kh, kw, c) containing the filter.
         kh : The height of the kernel.
         kw : The width of the kernel.
+        c : The number of channels (must match the input images).
     padding : str or tuple
-        If 'same', padding is calculated to maintain input spatial dimensions
-        (output = input / stride). If 'valid', no padding is applied.
+        If 'same', padding is calculated so the output has dimensions
+        ceil(input / stride). If 'valid', no padding is used.
         If a tuple (ph, pw), ph/pw are applied to both sides of the H/W axes.
     stride : tuple
         A tuple of (sh, sw) containing the stride for the height and width.
@@ -46,58 +41,56 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     numpy.ndarray
         A 3D array of shape (m, out_h, out_w) containing the convolved images.
     """
-    # m: batch size, h: input height, w: input width
-    m, h, w = images.shape
-    # kh: kernel height, kw: kernel width
-    kh, kw = kernel.shape
-    # sh: stride height, sw: stride width
+    # Extract image and kernel dimensions
+    m, h, w, c = images.shape
+    kh, kw, _ = kernel.shape
     sh, sw = stride
 
     # --- 1. Determine Padding Amounts ---
     if padding == 'same':
-        # Standard formula for 'same' padding to ensure the output
-        # spatial size is ceil(input_size / stride).
-        pad_h = int(np.ceil(((sh * (h - 1)) - h + kh) / 2))
-        pad_w = int(np.ceil(((sw * (w - 1)) - w + kw) / 2))
+        # Calculate padding to maintain 'same' output size relative to stride
+        ph = int(np.ceil(((sh * (h - 1)) - h + kh) / 2))
+        pw = int(np.ceil(((sw * (w - 1)) - w + kw) / 2))
     elif padding == 'valid':
-        pad_h, pad_w = 0, 0
+        ph, pw = 0, 0
     else:
-        # Custom padding provided as a tuple (ph, pw)
-        pad_h, pad_w = padding
+        # Custom padding from tuple (ph, pw)
+        ph, pw = padding
 
     # --- 2. Apply Zero Padding ---
-    # We apply the calculated padding symmetrically to the H and W axes.
-    # padded shape: (m, h + 2*pad_h, w + 2*pad_w)
+    # We pad only the height (axis 1) and width (axis 2) dimensions.
+    # The batch (axis 0) and channel (axis 3) dimensions are not padded.
     images_padded = np.pad(images,
-                           ((0, 0), (pad_h, pad_h), (pad_w, pad_w)),
+                           ((0, 0), (ph, ph), (pw, pw), (0, 0)),
                            mode='constant', constant_values=0)
 
-    # --- 3. Calculate Output Dimensions ---
-    # The output height and width are determined by how many windows
-    # fit into the padded image given the step size (stride).
-    out_h = (h + 2 * pad_h - kh) // sh + 1
-    out_w = (w + 2 * pad_w - kw) // sw + 1
+    # --- 3. Calculate Output Spatial Dimensions ---
+    out_h = (h + 2 * ph - kh) // sh + 1
+    out_w = (w + 2 * pw - kw) // sw + 1
 
     # Initialize the output tensor.
+    # Note: One kernel applied to multiple channels
+    # results in one output depth.
     output = np.zeros((m, out_h, out_w))
 
     # --- 4. Perform Convolution ---
-    # We iterate over the output dimensions (i, j).
-    # This loop allows us to jump across the image according to the stride.
+    # We iterate over the output spatial dimensions (i, j).
     for i in range(out_h):
         for j in range(out_w):
-            # Calculate the top-left starting corner for the current stride
+            # Determine the window boundaries in the padded images
             h_start = i * sh
             w_start = j * sw
 
-            # Extract the 'window' across the entire batch (m images).
-            # window shape: (m, kh, kw)
+            # Extract the 4D window across all images and all channels.
+            # window shape: (m, kh, kw, c)
             window = images_padded[:, h_start:h_start + kh,
-                                   w_start:w_start + kw]
+                                   w_start:w_start + kw, :]
 
-            # Multiply the window by the kernel (broadcasting kernel weights
-            # across the batch) and sum the height/width axes (1 and 2).
-            # This yields a result vector of length 'm'.
-            output[:, i, j] = np.sum(window * kernel, axis=(1, 2))
+            # Multiply the window
+            # by the kernel (broadcasting across batch 'm').
+            # Sum across axis 1 (kh), 2 (kw), and 3 (c).
+            # This collapses the local neighborhood
+            # into a single scalar per image.
+            output[:, i, j] = np.sum(window * kernel, axis=(1, 2, 3))
 
     return output
