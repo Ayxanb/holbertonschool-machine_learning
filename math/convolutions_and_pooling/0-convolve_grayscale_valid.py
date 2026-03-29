@@ -59,7 +59,7 @@ def convolve_grayscale_valid(images, kernel):
             # images[:, ky:ky + out_h, kx:kx + out_w] extracts a 'slice' of
             # the entire batch that is offset by the current kernel index.
             # This 'slice' has the same shape as the 'output' array.
-            
+
             # Multiply the batch slice by the specific scalar weight at
             # kernel[ky, kx] and add the result to the output accumulator.
             output += images[:, ky:ky + out_h, kx:kx + out_w] * kernel[ky, kx]
