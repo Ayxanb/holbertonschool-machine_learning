@@ -1,17 +1,48 @@
 #!/usr/bin/env python3
+"""
+This module contains the function `convolve_grayscale`.
+It performs a convolution on a batch of grayscale images, supporting
+'same' padding, 'valid' padding, custom padding, and custom strides.
+"""
 import numpy as np
-
-"""
-This module contains `convolve_grayscale` function.
-"""
 
 
 def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     """
-    Performs a convolution on a batch of grayscale images
-    with custom padding and stride.
+    Performs a convolution on a batch of grayscale images.
+
+    This function applies a convolution kernel to a batch of images. It
+    calculates padding based on the desired mode and slides the kernel
+    across the images based on the specified stride. The operation is
+    vectorized across the batch of images.
+
+    Parameters
+    ----------
+    images : numpy.ndarray
+        A 3D array of shape (m, h, w) containing the image batch.
+        m : The number of images.
+        h : The height of each image in pixels.
+        w : The width of each image in pixels.
+    kernel : numpy.ndarray
+        A 2D array of shape (kh, kw) containing the convolution filter.
+        kh : The height of the kernel.
+        kw : The width of the kernel.
+    padding : str or tuple
+        If 'same', padding is calculated so the output has dimensions
+        ceil(input / stride). If 'valid', no padding is used. If a
+        tuple (ph, pw), ph is the height padding and pw is the width
+        padding applied to each side.
+    stride : tuple
+        A tuple of (sh, sw) containing the stride for the height and
+        width, respectively.
+
+    Returns
+    -------
+    numpy.ndarray
+        A 3D array of shape (m, out_h, out_w) containing the convolved
+        images.
     """
-    # m: number of images, h: height, w: width
+    # m: batch size, h: input height, w: input width
     m, h, w = images.shape
     # kh: kernel height, kw: kernel width
     kh, kw = kernel.shape
@@ -20,54 +51,50 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
 
     # --- 1. Determine Padding Amounts ---
     if padding == 'same':
-        # Formula for 'same' padding with stride:
-        # P = ((S - 1) * stride + K - S)
-        # We ensure the output size is ceil(input size / stride)
-
-        # Height padding
-        ph = (((h - 1) * sh + kh - h) // 2) + 1 \
-                if h % sh == 0 else ((h - 1) * sh + kh - h) // 2
-        # A simpler, widely accepted version for many checkers:
-        ph = int(np.ceil(((sh * (h - 1)) - h + kh) / 2))
-        pw = int(np.ceil(((sw * (w - 1)) - w + kw) / 2))
-
-        pad_h, pad_w = ph, pw
+        # 'Same' padding ensures the filter covers the entire input.
+        # The output size will be ceil(h / sh) and ceil(w / sw).
+        # We use the standard formula to find the required zero-padding.
+        pad_h = int(np.ceil(((sh * (h - 1)) - h + kh) / 2))
+        pad_w = int(np.ceil(((sw * (w - 1)) - w + kw) / 2))
     elif padding == 'valid':
         pad_h, pad_w = 0, 0
     else:
-        # Custom padding from tuple (ph, pw)
+        # User provides custom padding as (ph, pw)
         pad_h, pad_w = padding
 
     # --- 2. Apply Zero Padding ---
-    # We apply the same amount of padding to both sides
-    # padded shape: (m, h + 2*ph, w + 2*pw)
+    # np.pad adds zeros to the top/bottom (axis 1) and left/right (axis 2).
+    # images_padded shape: (m, h + 2*pad_h, w + 2*pad_w)
     images_padded = np.pad(images,
                            ((0, 0), (pad_h, pad_h), (pad_w, pad_w)),
                            mode='constant', constant_values=0)
 
     # --- 3. Calculate Output Dimensions ---
+    # The output size is the number of times the kernel 'fits' into the 
+    # padded image while jumping by the stride.
     out_h = (h + 2 * pad_h - kh) // sh + 1
     out_w = (w + 2 * pad_w - kw) // sw + 1
 
-    # Initialize the output array
+    # Initialize the output tensor.
     output = np.zeros((m, out_h, out_w))
 
     # --- 4. Perform Convolution ---
-    # We loop over the output spatial dimensions (i, j).
-    # This allows us to handle strides naturally.
+    # We iterate over the output dimensions (i, j).
+    # This loop is necessary to handle strides effectively.
     for i in range(out_h):
         for j in range(out_w):
-            # Calculate the starting pixel in the padded image for this window
+            # Calculate the top-left corner of the current window.
             h_start = i * sh
             w_start = j * sw
 
-            # Slice the "window" for all m images at once
+            # Extract the window for all m images simultaneously.
             # Window shape: (m, kh, kw)
-            window = images_padded[:, h_start:h_start+kh, w_start:w_start+kw]
+            window = images_padded[:, h_start:h_start + kh,
+                                   w_start:w_start + kw]
 
-            # Multiply the window by the kernel (broadcasting) and sum over
-            # the height (axis 1) and width (axis 2) of the kernel.
-            # This results in a vector of length 'm' (one value per image).
+            # Element-wise multiply the kernel against all windows in
+            # the batch. Sum the results across the spatial axes
+            # (1 and 2) to get a single value per image.
             output[:, i, j] = np.sum(window * kernel, axis=(1, 2))
 
     return output
