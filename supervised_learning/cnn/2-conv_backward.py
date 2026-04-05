@@ -27,8 +27,8 @@ def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
 
     # Determine padding
     if padding == "same":
-        ph = ((h_prev - 1) * sh + kh - h_prev) // 2 + (h_prev % 2 == 0)
-        pw = ((w_prev - 1) * sw + kw - w_prev) // 2 + (w_prev % 2 == 0)
+        ph = int(np.ceil(((h_prev - 1) * sh + kh - h_prev) / 2))
+        pw = int(np.ceil(((w_prev - 1) * sw + kw - w_prev) / 2))
     else:
         ph, pw = 0, 0
 
@@ -37,34 +37,35 @@ def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
     dW = np.zeros_like(W)
     db = np.sum(dZ, axis=(0, 1, 2), keepdims=True)
 
-    # Pad A_prev and dA_prev
+    # Pad inputs
     A_padded = np.pad(A_prev, ((0, 0), (ph, ph), (pw, pw), (0, 0)),
                       mode='constant')
-    dA_padded = np.pad(dA_prev, ((0, 0), (ph, ph), (pw, pw), (0, 0)),
-                       mode='constant')
+    dA_padded = np.zeros_like(A_padded)
 
-    for i in range(m):  # Loop over examples
-        a_prev_pad = A_padded[i]
-        da_prev_pad = dA_padded[i]
-        for h in range(h_new):  # Loop over vertical output
-            for w in range(w_new):  # Loop over horizontal output
-                for c in range(c_new):  # Loop over channels
-                    h_start, w_start = h * sh, w * sw
-                    h_end, w_end = h_start + kh, w_start + kw
+    for i in range(m):
+        for h in range(h_new):
+            for w in range(w_new):
+                for c in range(c_new):
+                    # Define the corners of the current slice
+                    v_start = h * sh
+                    v_end = v_start + kh
+                    h_start = w * sw
+                    h_end = h_start + kw
 
-                    # Extract current slice
-                    a_slice = a_prev_pad[h_start:h_end, w_start:w_end, :]
+                    # Extract the slice from the padded input
+                    a_slice = A_padded[i, v_start:v_end, h_start:h_end, :]
 
-                    # Update gradients
-                    da_prev_pad[h_start:h_end, w_start:w_end, :] += (
+                    # Update gradients for the window
+                    dA_padded[i, v_start:v_end, h_start:h_end, :] += (
                         W[:, :, :, c] * dZ[i, h, w, c]
                     )
                     dW[:, :, :, c] += a_slice * dZ[i, h, w, c]
 
-        # Remove padding from dA_prev
-        if padding == "same":
-            dA_prev[i, :, :, :] = da_prev_pad[ph:-ph, pw:-pw, :]
-        else:
-            dA_prev[i, :, :, :] = da_prev_pad
+    # Strip padding from dA_prev
+    if padding == "same":
+        dA_prev = dA_padded[:, ph:-ph if ph != 0 else None,
+                            pw:-pw if pw != 0 else None, :]
+    else:
+        dA_prev = dA_padded
 
     return dA_prev, dW, db
