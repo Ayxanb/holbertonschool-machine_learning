@@ -22,4 +22,4 @@ def change_hue(image, delta):
     Returns:
         tf.Tensor: The hue-adjusted image tensor.
     """
-    return tf.image.adjust_hue(image, delta=size)
+    return tf.image.adjust_hue(image, delta)
