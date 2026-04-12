@@ -23,5 +23,5 @@ def crop_image(image, size):
         tf.Tensor: The randomly cropped image tensor.
     """
     if len(size) == 2:
-        size = (size[0], size[1], image.shape[-1]) 
+        size = (size[0], size[1], image.shape[-1])
     return tf.image.random_crop(image, size=size)
