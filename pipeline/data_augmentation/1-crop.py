@@ -1,3 +1,4 @@
+#!/bin/usr/env python3
 """
 This module provides utility functions for image preprocessing.
 
