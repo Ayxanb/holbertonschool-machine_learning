@@ -22,12 +22,8 @@ def change_contrast(image, lower, upper):
     Returns:
         tf.Tensor: The contrast-adjusted image tensor.
     """
-    # tf.image.random_contrast picks a value from [lower, upper]
-    # and scales the contrast of the image by that factor.
-    adjusted_image = tf.image.random_contrast(
-        image,
-        lower=lower,
-        upper=upper
+    return tf.image.random_contrast(
+            image,
+            lower=lower,
+            upper=upper
     )
-
-    return adjusted_image
