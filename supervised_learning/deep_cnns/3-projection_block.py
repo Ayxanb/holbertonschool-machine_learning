@@ -22,7 +22,6 @@ def resnet50():
         padding='same', kernel_initializer=init
     )(inputs)
     x = K.layers.BatchNormalization(axis=3)(x)
-    # MUST be K.layers.ReLU() to match the checker, not Activation('relu')
     x = K.layers.ReLU()(x)
     x = K.layers.MaxPooling2D(
         pool_size=(3, 3), strides=(2, 2), padding='same'
@@ -62,7 +61,6 @@ def resnet50():
         units=1000, activation='softmax', kernel_initializer=init
     )(x)
 
-    # Do not include name='ResNet50' so it defaults to 'model'
     model = K.models.Model(inputs=inputs, outputs=outputs)
 
     return model
