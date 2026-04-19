@@ -4,7 +4,7 @@
 This module contains `identity_block` function.
 '''
 
-import tensorflow.keras as keras
+from tensorflow import keras
 
 
 def identity_block(A_prev, filters):
