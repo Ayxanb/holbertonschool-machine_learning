@@ -9,27 +9,27 @@ from tensorflow import keras as K
 
 def identity_block(A_prev, filters):
     """
-    Build an identity block as described in Deep Residual Learning 
+    Build an identity block as described in Deep Residual Learning
     for Image Recognition (2015).
-    
+
     Args:
         A_prev: tensor, output from the previous layer
         filters: tuple or list containing F11, F3, F12
             F11: number of filters in the first 1x1 convolution
             F3: number of filters in the 3x3 convolution
             F12: number of filters in the second 1x1 convolution
-            
+
     Returns:
         The activated output of the identity block
     """
     f11, f3, f12 = filters
-    
+
     # He Normal initializer with seed=0
     initializer = K.initializers.HeNormal(seed=0)
-    
+
     # Save the input value to add later to the main path
     shortcut = A_prev
-    
+
     # First component of main path (1x1 convolution)
     x = K.layers.Conv2D(
         filters=f11,
@@ -40,7 +40,7 @@ def identity_block(A_prev, filters):
     )(A_prev)
     x = K.layers.BatchNormalization(axis=3)(x)
     x = K.layers.Activation('relu')(x)
-    
+
     # Second component of main path (3x3 convolution)
     x = K.layers.Conv2D(
         filters=f3,
@@ -51,7 +51,7 @@ def identity_block(A_prev, filters):
     )(x)
     x = K.layers.BatchNormalization(axis=3)(x)
     x = K.layers.Activation('relu')(x)
-    
+
     # Third component of main path (1x1 convolution)
     x = K.layers.Conv2D(
         filters=f12,
