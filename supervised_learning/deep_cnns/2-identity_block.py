@@ -4,7 +4,7 @@
 This module contains `identity_block` function.
 '''
 
-from tensorflow import keras
+from tensorflow import keras as K
 
 
 def identity_block(A_prev, filters):
@@ -25,43 +25,43 @@ def identity_block(A_prev, filters):
     f11, f3, f12 = filters
     
     # He Normal initializer with seed=0
-    initializer = keras.initializers.HeNormal(seed=0)
+    initializer = K.initializers.HeNormal(seed=0)
     
     # Save the input value to add later to the main path
     shortcut = A_prev
     
     # First component of main path (1x1 convolution)
-    x = keras.layers.Conv2D(
+    x = K.layers.Conv2D(
         filters=f11,
         kernel_size=(1, 1),
         strides=(1, 1),
         padding='valid',
         kernel_initializer=initializer
     )(A_prev)
-    x = keras.layers.BatchNormalization(axis=3)(x)
-    x = keras.layers.Activation('relu')(x)
+    x = K.layers.BatchNormalization(axis=3)(x)
+    x = K.layers.Activation('relu')(x)
     
     # Second component of main path (3x3 convolution)
-    x = keras.layers.Conv2D(
+    x = K.layers.Conv2D(
         filters=f3,
         kernel_size=(3, 3),
         strides=(1, 1),
         padding='same',
         kernel_initializer=initializer
     )(x)
-    x = keras.layers.BatchNormalization(axis=3)(x)
-    x = keras.layers.Activation('relu')(x)
+    x = K.layers.BatchNormalization(axis=3)(x)
+    x = K.layers.Activation('relu')(x)
     
     # Third component of main path (1x1 convolution)
-    x = keras.layers.Conv2D(
+    x = K.layers.Conv2D(
         filters=f12,
         kernel_size=(1, 1),
         strides=(1, 1),
         padding='valid',
         kernel_initializer=initializer
     )(x)
-    x = keras.layers.BatchNormalization(axis=3)(x)
-    x = keras.layers.Add()([x, shortcut])
-    x = keras.layers.Activation('relu')(x)
+    x = K.layers.BatchNormalization(axis=3)(x)
+    x = K.layers.Add()([x, shortcut])
+    x = K.layers.Activation('relu')(x)
 
     return x
