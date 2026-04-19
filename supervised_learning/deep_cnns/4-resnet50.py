@@ -19,26 +19,26 @@ def resnet50():
         The Keras Model instance for ResNet-50.
     """
     # Define the input tensor
-    inputs = keras.Input(shape=(224, 224, 3))
+    inputs = K.Input(shape=(224, 224, 3))
 
     # He Normal initializer with seed=0 for all weights
-    initializer = keras.initializers.HeNormal(seed=0)
+    initializer = K.initializers.HeNormal(seed=0)
 
     # ------------------------------------------------------------------------
     # Stage 1
     # ------------------------------------------------------------------------
-    x = keras.layers.Conv2D(
+    x = K.layers.Conv2D(
         filters=64,
         kernel_size=(7, 7),
         strides=(2, 2),
         padding='same',
         kernel_initializer=initializer
     )(inputs)
-    x = keras.layers.BatchNormalization(axis=3)(x)
-    x = keras.layers.Activation('relu')(x)
+    x = K.layers.BatchNormalization(axis=3)(x)
+    x = K.layers.Activation('relu')(x)
 
     # Max pooling downsamples to 56x56
-    x = keras.layers.MaxPooling2D(
+    x = K.layers.MaxPooling2D(
         pool_size=(3, 3),
         strides=(2, 2),
         padding='same'
@@ -82,19 +82,19 @@ def resnet50():
     # Average Pooling and Classification Head
     # ------------------------------------------------------------------------
     # Standard ResNet uses 7x7 average pooling at the end
-    x = keras.layers.AveragePooling2D(pool_size=(7, 7), padding='valid')(x)
+    x = K.layers.AveragePooling2D(pool_size=(7, 7), padding='valid')(x)
 
     # Flatten the output to feed into the Dense layer
-    x = keras.layers.Flatten()(x)
+    x = K.layers.Flatten()(x)
 
     # Fully connected layer for 1000 classes (ImageNet standard)
-    outputs = keras.layers.Dense(
+    outputs = K.layers.Dense(
         units=1000,
         activation='softmax',
         kernel_initializer=initializer
     )(x)
 
     # Instantiate the model
-    model = keras.models.Model(inputs=inputs, outputs=outputs, name='ResNet50')
+    model = K.models.Model(inputs=inputs, outputs=outputs, name='ResNet50')
 
     return model
