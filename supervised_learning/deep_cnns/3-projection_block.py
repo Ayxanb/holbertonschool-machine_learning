@@ -1,49 +1,68 @@
 #!/usr/bin/env python3
 """
-Projection Block module for ResNet-50.
+ResNet-50 Architecture module.
 """
 from tensorflow import keras as K
 
+identity_block = __import__('2-identity_block').identity_block
+projection_block = __import__('3-projection_block').projection_block
 
-def projection_block(A_prev, filters, s=2):
+
+def resnet50():
     """
-    Build a projection block as described in Deep Residual Learning
-    for Image Recognition (2015).
+    Build the ResNet-50 architecture as described in Deep Residual
+    Learning for Image Recognition (2015).
     """
-    f11, f3, f12 = filters
+    inputs = K.Input(shape=(224, 224, 3))
     init = K.initializers.HeNormal(seed=0)
-    shortcut = A_prev
 
-    # MAIN PATH
+    # Stage 1
     x = K.layers.Conv2D(
-        filters=f11, kernel_size=(1, 1), strides=(s, s),
-        padding='valid', kernel_initializer=init
-    )(A_prev)
-    x = K.layers.BatchNormalization(axis=3)(x)
-    x = K.layers.ReLU()(x)
-
-    x = K.layers.Conv2D(
-        filters=f3, kernel_size=(3, 3), strides=(1, 1),
+        filters=64, kernel_size=(7, 7), strides=(2, 2),
         padding='same', kernel_initializer=init
-    )(x)
+    )(inputs)
     x = K.layers.BatchNormalization(axis=3)(x)
+    # MUST be K.layers.ReLU() to match the checker, not Activation('relu')
     x = K.layers.ReLU()(x)
-
-    x = K.layers.Conv2D(
-        filters=f12, kernel_size=(1, 1), strides=(1, 1),
-        padding='valid', kernel_initializer=init
+    x = K.layers.MaxPooling2D(
+        pool_size=(3, 3), strides=(2, 2), padding='same'
     )(x)
-    x = K.layers.BatchNormalization(axis=3)(x)
 
-    # SHORTCUT PATH
-    shortcut = K.layers.Conv2D(
-        filters=f12, kernel_size=(1, 1), strides=(s, s),
-        padding='valid', kernel_initializer=init
-    )(shortcut)
-    shortcut = K.layers.BatchNormalization(axis=3)(shortcut)
+    # Stage 2
+    x = projection_block(x, filters=(64, 64, 256), s=1)
+    x = identity_block(x, filters=(64, 64, 256))
+    x = identity_block(x, filters=(64, 64, 256))
 
-    # Addition and final ReLU
-    x = K.layers.Add()([x, shortcut])
-    x = K.layers.ReLU()(x)
+    # Stage 3
+    x = projection_block(x, filters=(128, 128, 512), s=2)
+    x = identity_block(x, filters=(128, 128, 512))
+    x = identity_block(x, filters=(128, 128, 512))
+    x = identity_block(x, filters=(128, 128, 512))
 
-    return x
+    # Stage 4
+    x = projection_block(x, filters=(256, 256, 1024), s=2)
+    x = identity_block(x, filters=(256, 256, 1024))
+    x = identity_block(x, filters=(256, 256, 1024))
+    x = identity_block(x, filters=(256, 256, 1024))
+    x = identity_block(x, filters=(256, 256, 1024))
+    x = identity_block(x, filters=(256, 256, 1024))
+
+    # Stage 5
+    x = projection_block(x, filters=(512, 512, 2048), s=2)
+    x = identity_block(x, filters=(512, 512, 2048))
+    x = identity_block(x, filters=(512, 512, 2048))
+
+    # Average Pooling and Classification Head
+    x = K.layers.AveragePooling2D(
+        pool_size=(7, 7), padding='valid'
+    )(x)
+    x = K.layers.Flatten()(x)
+
+    outputs = K.layers.Dense(
+        units=1000, activation='softmax', kernel_initializer=init
+    )(x)
+
+    # Do not include name='ResNet50' so it defaults to 'model'
+    model = K.models.Model(inputs=inputs, outputs=outputs)
+
+    return model
