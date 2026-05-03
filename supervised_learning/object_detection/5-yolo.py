@@ -179,8 +179,7 @@ class Yolo:
             pimages: a numpy.ndarray of shape (ni, input_h, input_w, 3)
             image_shapes: a numpy.ndarray of shape (ni, 2)
         """
-        # Get model input dimensions
-        # Expected shape: (None, input_h, input_w, 3)
+        # Get model input dimensions (usually 416, 416)
         input_h = self.model.input.shape[1]
         input_w = self.model.input.shape[2]
 
@@ -188,18 +187,23 @@ class Yolo:
         image_shapes = []
 
         for img in images:
-            # Save original shape (h, w)
+            # 1. Save original shape (height, width)
             image_shapes.append(img.shape[:2])
 
-            # Resize with inter-cubic interpolation
+            # 2. Resize with inter-cubic interpolation
+            # Note: cv2.resize expects (width, height)
             resized = cv2.resize(
                 img,
                 (input_w, input_h),
                 interpolation=cv2.INTER_CUBIC
             )
 
-            # Rescale pixel values to [0, 1]
-            rescaled = resized / 255.0
+            # 3. Convert from BGR (OpenCV default) to RGB
+            # This is often the missing step causing checker failures
+            img_rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+
+            # 4. Rescale pixel values to [0, 1]
+            rescaled = img_rgb / 255.0
             pimages.append(rescaled)
 
         # Convert lists to numpy arrays
