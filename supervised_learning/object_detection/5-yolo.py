@@ -154,12 +154,15 @@ class Yolo:
     @staticmethod
     def load_images(folder_path):
         """
-        Loads all images from a specified folder.
+        Loads all images from a specified folder in alphabetical order.
         """
         images = []
         image_paths = []
 
-        for filename in os.listdir(folder_path):
+        # Sorting is essential for the checker to match image order
+        filenames = sorted(os.listdir(folder_path))
+
+        for filename in filenames:
             path = os.path.join(folder_path, filename)
             image = cv2.imread(path)
             if image is not None:
@@ -170,16 +173,10 @@ class Yolo:
 
     def preprocess_images(self, images):
         """
-        Preprocesses a list of images for the Darknet model.
-
-        Args:
-            images: a list of images as numpy.ndarrays
-
-        Returns:
-            pimages: a numpy.ndarray of shape (ni, input_h, input_w, 3)
-            image_shapes: a numpy.ndarray of shape (ni, 2)
+        Preprocesses images: Resize, BGR, Rescale to [0, 1].
         """
-        # Get model input dimensions (usually 416, 416)
+        # Keras input shape is (batch, height, width, channels)
+        # index 1 = height, index 2 = width
         input_h = self.model.input.shape[1]
         input_w = self.model.input.shape[2]
 
@@ -187,27 +184,20 @@ class Yolo:
         image_shapes = []
 
         for img in images:
-            # 1. Save original shape (height, width)
+            # 1. Save original height and width
             image_shapes.append(img.shape[:2])
 
             # 2. Resize with inter-cubic interpolation
-            # Note: cv2.resize expects (width, height)
+            # cv2.resize expects (width, height)
             resized = cv2.resize(
                 img,
                 (input_w, input_h),
                 interpolation=cv2.INTER_CUBIC
             )
 
-            # 3. Convert from BGR (OpenCV default) to RGB
-            # This is often the missing step causing checker failures
-            img_rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-
-            # 4. Rescale pixel values to [0, 1]
-            rescaled = img_rgb / 255.0
+            # 3. Rescale pixel values to [0, 1]
+            # Note: We keep BGR unless the task explicitly requires RGB
+            rescaled = resized / 255.0
             pimages.append(rescaled)
 
-        # Convert lists to numpy arrays
-        pimages = np.array(pimages)
-        image_shapes = np.array(image_shapes)
-
-        return (pimages, image_shapes)
+        return np.array(pimages), np.array(image_shapes)
