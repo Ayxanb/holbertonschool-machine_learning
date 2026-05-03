@@ -51,9 +51,6 @@ class Yolo:
         box_class_probs = []
 
         image_h, image_w = image_size
-        # The input shape of the model (usually 416x416)
-        model_h = self.model.input.shape[1]
-        model_w = self.model.input.shape[2]
 
         for i, output in enumerate(outputs):
             grid_h, grid_w, anchor_boxes, _ = output.shape
@@ -72,35 +69,40 @@ class Yolo:
             box_conf = sigmoid(box_conf)
             box_class = sigmoid(box_class)
 
-            # 3. Calculate grid offsets correctly
-            # Using indexing='ij' ensures grid matches (height, width)
-            cx, cy = np.meshgrid(np.arange(grid_w), np.arange(grid_h))
-            
-            # Reshape grid to (grid_h, grid_w, 1, 2)
-            grid = np.stack((cx, cy), axis=-1)
-            grid = np.expand_dims(grid, axis=2)
+            # 3. Create Grid
+            cx = np.arange(grid_w)
+            cy = np.arange(grid_h)
+            # Use default meshgrid, but ensure it matches the output shape
+            grid_x, grid_y = np.meshgrid(cx, cy)
+            grid = np.stack((grid_x, grid_y), axis=-1)
+            grid = grid.reshape((grid_h, grid_w, 1, 2))
 
-            # 4. Transform relative coordinates to model scale
+            # 4. Transform to relative (0 to 1) coordinates
+            # Box center: (sigmoid(t_xy) + grid_offset) / grid_size
             box_xy = (box_xy + grid) / [grid_w, grid_h]
-            
-            # anchors shape is (anchor_boxes, 2)
+
+            # Box dimensions: (anchor * exp(t_wh)) / model_input_size
+            # Note: The model input size is usually implicitly defined by
+            # (grid_size * stride). Stride is usually 32, 16, 8.
+            # Using the self.model.input.shape is the most reliable way:
+            input_w = self.model.input.shape[1]
+            input_h = self.model.input.shape[2]
+
             anchors = self.anchors[i]
-            box_wh = (np.exp(t_wh) * anchors) / [model_w, model_h]
+            box_wh = (np.exp(t_wh) * anchors) / [input_w, input_h]
 
             # 5. Convert to [x1, y1, x2, y2]
-            # Center coordinates minus/plus half width/height
             x1y1 = box_xy - (box_wh / 2)
             x2y2 = box_xy + (box_wh / 2)
 
-            # 6. Scale to original image size
-            # [x1, y1] * [width, height]
-            x1y1[..., 0] *= image_w
-            x1y1[..., 1] *= image_h
-            # [x2, y2] * [width, height]
-            x2y2[..., 0] *= image_w
-            x2y2[..., 1] *= image_h
-
+            # Concatenate to (grid_h, grid_w, anchor_boxes, 4)
+            # Order: x1, y1, x2, y2
             box_coords = np.concatenate([x1y1, x2y2], axis=-1)
+
+            # 6. Final Scale to Image Size
+            # Ensure we scale [x1, y1, x2, y2] by [w, h, w, h]
+            box_coords[..., [0, 2]] *= image_w
+            box_coords[..., [1, 3]] *= image_h
 
             boxes.append(box_coords)
             box_confidences.append(box_conf)
