@@ -45,72 +45,62 @@ class Yolo:
     def process_outputs(self, outputs, image_size):
         """
         Processes the outputs from the Darknet model.
-
-        Args:
-            outputs (list):
-                A list of numpy.ndarrays containing the predictions.
-            image_size (numpy.ndarray):
-                The image's original size [image_height, image_width].
-
-        Returns:
-            tuple: (boxes, box_confidences, box_class_probs)
         """
         boxes = []
         box_confidences = []
         box_class_probs = []
 
         image_h, image_w = image_size
-        model_h = int(self.model.input.shape[1])
-        model_w = int(self.model.input.shape[2])
+        # The input shape of the model (usually 416x416)
+        model_h = self.model.input.shape[1]
+        model_w = self.model.input.shape[2]
 
         for i, output in enumerate(outputs):
             grid_h, grid_w, anchor_boxes, _ = output.shape
 
-            # Slicing the output
-            # to extract bounding box coordinates, confidences
-            # and class probabilities
+            # 1. Extract raw predictions
             t_xy = output[..., :2]
             t_wh = output[..., 2:4]
             box_conf = output[..., 4:5]
             box_class = output[..., 5:]
 
-            # Apply sigmoid function to t_xy, box_conf, and box_class
-            box_xy = 1 / (1 + np.exp(-t_xy))
-            box_conf = 1 / (1 + np.exp(-box_conf))
-            box_class = 1 / (1 + np.exp(-box_class))
+            # 2. Apply sigmoid activation
+            def sigmoid(x):
+                return 1 / (1 + np.exp(-x))
 
-            # Create a grid of offsets for each cell
-            cx = np.arange(grid_w)
-            cy = np.arange(grid_h)
-            cx, cy = np.meshgrid(cx, cy)
+            box_xy = sigmoid(t_xy)
+            box_conf = sigmoid(box_conf)
+            box_class = sigmoid(box_class)
 
-            # Stack and expand dimensions to match (grid_h, grid_w, 1, 2)
-            grid = np.expand_dims(np.stack((cx, cy), axis=-1), axis=2)
+            # 3. Calculate grid offsets correctly
+            # Using indexing='ij' ensures grid matches (height, width)
+            cx, cy = np.meshgrid(np.arange(grid_w), np.arange(grid_h))
+            
+            # Reshape grid to (grid_h, grid_w, 1, 2)
+            grid = np.stack((cx, cy), axis=-1)
+            grid = np.expand_dims(grid, axis=2)
 
-            # Add the grid offset to box_xy, normalize by the grid dimensions
+            # 4. Transform relative coordinates to model scale
             box_xy = (box_xy + grid) / [grid_w, grid_h]
-
-            # Calculate the box dimensions (width and height)
-            # normalize by model dimensions
+            
+            # anchors shape is (anchor_boxes, 2)
             anchors = self.anchors[i]
             box_wh = (np.exp(t_wh) * anchors) / [model_w, model_h]
 
-            # Convert (center_x, center_y, width, height) to (x1, y1, x2, y2)
-            x1 = box_xy[..., 0:1] - (box_wh[..., 0:1] / 2)
-            y1 = box_xy[..., 1:2] - (box_wh[..., 1:2] / 2)
-            x2 = box_xy[..., 0:1] + (box_wh[..., 0:1] / 2)
-            y2 = box_xy[..., 1:2] + (box_wh[..., 1:2] / 2)
+            # 5. Convert to [x1, y1, x2, y2]
+            # Center coordinates minus/plus half width/height
+            x1y1 = box_xy - (box_wh / 2)
+            x2y2 = box_xy + (box_wh / 2)
 
-            # Scale the bounding box coordinates
-            # back to the original image size
-            x1 *= image_w
-            y1 *= image_h
-            x2 *= image_w
-            y2 *= image_h
+            # 6. Scale to original image size
+            # [x1, y1] * [width, height]
+            x1y1[..., 0] *= image_w
+            x1y1[..., 1] *= image_h
+            # [x2, y2] * [width, height]
+            x2y2[..., 0] *= image_w
+            x2y2[..., 1] *= image_h
 
-            # Concatenate coordinates to
-            # shape (grid_h, grid_w, anchor_boxes, 4)
-            box_coords = np.concatenate([x1, y1, x2, y2], axis=-1)
+            box_coords = np.concatenate([x1y1, x2y2], axis=-1)
 
             boxes.append(box_coords)
             box_confidences.append(box_conf)
