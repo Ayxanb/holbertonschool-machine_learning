@@ -84,9 +84,12 @@ class Yolo:
         Filters boxes based on their objectness score and class probability.
 
         Args:
-            boxes: list of ndarrays of shape (grid_h, grid_w, anchors, 4)
-            box_confidences: list of ndarrays of shape (grid_h, grid_w, anchors, 1)
-            box_class_probs: list of ndarrays of shape (grid_h, grid_w, anchors, cls)
+            boxes:
+                list of ndarrays of shape (grid_h, grid_w, anchors, 4)
+            box_confidences:
+                list of ndarrays of shape (grid_h, grid_w, anchors, 1)
+            box_class_probs:
+                list of ndarrays of shape (grid_h, grid_w, anchors, cls)
 
         Returns:
             tuple: (filtered_boxes, box_classes, box_scores)
