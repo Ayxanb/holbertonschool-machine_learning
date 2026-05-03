@@ -145,8 +145,8 @@ class Yolo:
 
                 # Areas
                 area1 = (rect1[2] - rect1[0]) * (rect1[3] - rect1[1])
-                area_rest = (rest[:, 2] - rest[:, 0]) *
-                (rest[:, 3] - rest[:, 1])
+                area_rest = (rest[:, 2] - rest[:, 0]) * \
+                            (rest[:, 3] - rest[:, 1])
 
                 iou = intersection / (area1 + area_rest - intersection)
 
