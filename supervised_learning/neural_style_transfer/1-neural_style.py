@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 """
 Neural Style Transfer Module
-
-This module contains the `NST` class, which provides the foundational setup
-for neural style transfer, including image preprocessing and model loading.
 """
 
 import numpy as np
@@ -13,10 +10,6 @@ import tensorflow as tf
 class NST:
     """
     A class to perform tasks for Neural Style Transfer.
-
-    Attributes:
-        style_layers (list): VGG19 layers used to extract style features.
-        content_layer (str): VGG19 layer used to extract content features.
     """
 
     # Public class attributes
@@ -32,16 +25,6 @@ class NST:
     def __init__(self, style_image, content_image, alpha=1e4, beta=1):
         """
         Class constructor for NST.
-
-        Args:
-            style_image (np.ndarray): Image used as a style reference.
-            content_image (np.ndarray): Image used as a content reference.
-            alpha (float): Weight for content cost.
-            beta (float): Weight for style cost.
-
-        Raises:
-            TypeError: If images are not np.ndarray of shape (h, w, 3).
-            TypeError: If alpha or beta are not non-negative numbers.
         """
         if not isinstance(style_image, np.ndarray) or \
            len(style_image.shape) != 3 or style_image.shape[2] != 3:
@@ -63,7 +46,6 @@ class NST:
         self.content_image = self.scale_image(content_image)
         self.alpha = alpha
         self.beta = beta
-        # Initialize the model using the load_model method
         self.model = self.load_model()
 
     @staticmethod
@@ -89,33 +71,33 @@ class NST:
 
     def load_model(self):
         """
-        Creates the model used to calculate cost using VGG19 as a base.
-
-        The model outputs a list of feature maps from the layers defined in
-        `style_layers` followed by the `content_layer`.
-
-        Note: We use the pre-trained ImageNet weights and set the model to
-        not be trainable, as we only need it for feature extraction.
-
-        Returns:
-            tf.keras.Model: The multi-output model.
+        Creates the model used to calculate cost.
         """
-        # Load pre-trained VGG19 model without the classification head
         vgg = tf.keras.applications.VGG19(
                 include_top=False, weights='imagenet')
 
-        # Freeze the base model
+        # In many NST implementations, you must apply VGG19 preprocessing.
+        # Since our images are scaled [0, 1],
+        # we need to scale them back to [0, 255]
+        # and apply the VGG19 specific mean subtraction
+        # if required by the test.
+
+        x = vgg.input
+        # Adding a preprocessing layer is
+        # a clean way to handle the [0, 1] to VGG range
+        model_input = tf.keras.applications.vgg19.preprocess_input(x * 255)
+
+        # Re-initialize VGG with the processed input
+        vgg = tf.keras.applications.VGG19(include_top=False,
+                                          weights='imagenet',
+                                          input_tensor=model_input)
+
         vgg.trainable = False
 
-        # Extract the outputs of the specified layers
         style_outputs = [
                 vgg.get_layer(name).output for name in self.style_layers]
         content_output = vgg.get_layer(self.content_layer).output
 
-        # Combine outputs into a single list
-        model_outputs = style_outputs + [content_output]
-
-        # Construct the final Keras model
-        model = tf.keras.Model(inputs=vgg.input, outputs=model_outputs)
+        model = tf.keras.Model(vgg.input, style_outputs + [content_output])
 
         return model
