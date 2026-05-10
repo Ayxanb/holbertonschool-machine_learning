@@ -1,31 +1,68 @@
 #!/usr/bin/env python3
+"""
+Neural Style Transfer Module
+
+This module contains the `NST` class, which provides the foundational setup
+and preprocessing tasks required for performing neural style transfer (NST).
+It utilizes TensorFlow and NumPy to manipulate and scale images appropriately
+for input into a deep neural network (such as VGG19).
+"""
 
 import numpy as np
 import tensorflow as tf
-
-"""
-This module contains a class NST that performs tasks for neural style transfer
-"""
 
 
 class NST:
     """
     A class to perform tasks for Neural Style Transfer.
+
+    This class sets up the necessary style and content layers to be extracted
+    from a pre-trained model and handles the initialization, validation, and
+    preprocessing of the style and content images.
+
+    Attributes:
+        style_layers (list): A list of strings identifying the network layers
+            used to extract the style features. Default is ['block1_conv1',
+            'block2_conv1', 'block3_conv1', 'block4_conv1', 'block5_conv1'].
+        content_layer (str): A string identifying the network layer used to
+            extract the content features. Default is 'block5_conv2'.
     """
 
     # Public class attributes
     style_layers = [
-            'block1_conv1',
-            'block2_conv1',
-            'block3_conv1',
-            'block4_conv1',
-            'block5_conv1'
-        ]
+        'block1_conv1',
+        'block2_conv1',
+        'block3_conv1',
+        'block4_conv1',
+        'block5_conv1'
+    ]
     content_layer = 'block5_conv2'
 
     def __init__(self, style_image, content_image, alpha=1e4, beta=1):
         """
-        Class constructor for NST.
+        Class constructor for NST. Initializes and preprocesses the style
+        and content images, and sets the weighting factors for the costs.
+
+        Args:
+            style_image (numpy.ndarray): The image used as a style reference.
+                Must have the shape (h, w, 3).
+            content_image (numpy.ndarray):
+                The image used as a content reference.
+                Must have the shape (h, w, 3).
+            alpha (float or int, optional): The weight applied to the content
+                cost during optimization. Defaults to 1e4.
+            beta (float or int, optional): The weight applied to the style
+                cost during optimization. Defaults to 1.
+
+        Raises:
+            TypeError:
+                If `style_image` is not a numpy.ndarray of shape (h, w, 3).
+            TypeError:
+                If `content_image` is not a numpy.ndarray of shape (h, w, 3).
+            TypeError:
+                If `alpha` is not a non-negative number.
+            TypeError:
+                If `beta` is not a non-negative number.
         """
 
         # Validate style_image
@@ -58,8 +95,26 @@ class NST:
     @staticmethod
     def scale_image(image):
         """
-        Rescales an image such that its pixels values are between 0 and 1
-        and its largest side is 512 pixels.
+        Rescales an image such that its pixel values are between 0 and 1,
+        and its largest side is exactly 512 pixels.
+        The aspect ratio is maintained.
+
+        The image is converted to a TensorFlow tensor, expanded to include a
+        batch dimension, resized using bicubic interpolation, and its values
+        are clipped to ensure they strictly fall within the [0.0, 1.0] range.
+
+        Args:
+            image
+                (numpy.ndarray): The image to be scaled. Must have the shape
+                (h, w, 3) and original pixel values typically in the range
+                [0, 255]
+
+        Returns:
+            tf.Tensor: The scaled image tensor with shape (1, h_new, w_new, 3)
+                where max(h_new, w_new) == 512.
+
+        Raises:
+            TypeError: If `image` is not a numpy.ndarray of shape (h, w, 3).
         """
 
         # Validate image
