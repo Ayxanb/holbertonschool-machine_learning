@@ -111,7 +111,7 @@ class NST:
         style_outputs = [
                 vgg.get_layer(name).output for name in self.style_layers]
         content_output = vgg.get_layer(self.content_layer).output
-        
+
         # Combine outputs into a single list
         model_outputs = style_outputs + [content_output]
 
