@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+
+'''
+This module implements `kmeans` function
+'''
+
 import numpy as np
 
 
