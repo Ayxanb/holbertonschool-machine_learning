@@ -21,19 +21,9 @@ def variance(X, C):
         return None
 
     try:
-        # Step 1: Compute distances from all points to all centroids
-        # Shape: (n, k, d) -> distance components across dimensions
         diff = X[:, None, :] - C[None, :, :]
-
-        # Step 2: Calculate squared Euclidean distances for each pair
-        # Shape: (n, k)
         sq_distances = np.sum(diff**2, axis=2)
-
-        # Step 3: Find the minimum squared distance for each point
-        # Shape: (n,)
         min_sq_distances = np.min(sq_distances, axis=1)
-
-        # Step 4: Sum up the minimum squared distances to get total variance
         total_variance = np.sum(min_sq_distances)
 
         return total_variance
