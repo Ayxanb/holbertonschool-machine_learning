@@ -31,25 +31,13 @@ def pdf(X, m, S):
         return None
 
     try:
-        # Step 1: Calculate the determinant and inverse of covariance S
         det_S = np.linalg.det(S)
         inv_S = np.linalg.inv(S)
-
-        # Step 2: Calculate the normalization coefficient
-        # 1 / sqrt((2 * pi)^d * det(S))
         norm_factor = 1.0 / np.sqrt(((2 * np.pi) ** d) * det_S)
-
-        # Step 3: Compute deviation from mean (x - m) for all points -> (n, d)
         dev = X - m
 
-        # Step 4: Calculate the Mahalanobis distance component
-        # Vectorized equivalent of (x - m)^T * S^-1 * (x - m) without loops:
-        # np.dot(dev, inv_S) gives (n, d) where each row is (x - m)^T * S^-1.
-        # Multiplying element-wise by dev (* dev) and summing along axis 1
-        # yields the final scalar product for each of the n data points.
         mahalanobis = np.sum(np.dot(dev, inv_S) * dev, axis=1)
 
-        # Step 5: Compute probabilities and apply the floor limit
         P = norm_factor * np.exp(-0.5 * mahalanobis)
         P = np.maximum(P, 1e-300)
 
