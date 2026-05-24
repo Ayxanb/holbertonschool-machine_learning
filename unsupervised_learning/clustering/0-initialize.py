@@ -4,6 +4,7 @@
 This module contains `initialize` function
 that initializes K-means.
 '''
+import numpy as np
 
 
 def initialize(X, k):
