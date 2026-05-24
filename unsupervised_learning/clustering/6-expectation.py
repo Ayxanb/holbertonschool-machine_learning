@@ -59,11 +59,11 @@ def expectation(X, pi, m, S):
         marginal_densities = np.sum(probs, axis=0)
 
         # Log likelihood calculation
-        l = np.sum(np.log(marginal_densities))
+        lg = np.sum(np.log(marginal_densities))
 
         # Normalize to find posterior distribution matrix
         g = probs / marginal_densities
 
-        return g, l
+        return g, lg
     except Exception:
         return None, None
