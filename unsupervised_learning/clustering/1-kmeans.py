@@ -53,10 +53,8 @@ def kmeans(X, k, iterations=1000):
     for _ in range(iterations):
         C_old = C.copy()
 
-        # Compute Euclidean distances using broadcasting: shape (n, k)
+        # Compute Euclidean distances using broadcasting
         distances = np.linalg.norm(X[:, None, :] - C[None, :, :], axis=2)
-
-        # FIX: Find closest centroid across columns (axis 1), yielding (n,)
         clss = np.argmin(distances, axis=1)
 
         # Loop 2: Iterating through each cluster to update its mean
@@ -66,10 +64,15 @@ def kmeans(X, k, iterations=1000):
             if len(points_in_cluster) > 0:
                 C[j] = np.mean(points_in_cluster, axis=0)
             else:
-                # Reinitialize empty cluster centroid
-                C[j] = np.random.uniform(low, high, size=(1, X.shape[1]))
+                # Shape matches row dimension (d,) instead of (1, d)
+                C[j] = np.random.uniform(low, high, size=X.shape[1])
 
+        # Break if centroids did not change from the start of the iteration
         if np.all(C == C_old):
             break
 
-    return C, clss
+    # Recalculate assignments one last time to capture final state clean
+    distances = np.linalg.norm(X[:, None, :] - C[None, :, :], axis=2)
+    clss = np.argmin(distances, axis=1)
+
+    return C, clss 
