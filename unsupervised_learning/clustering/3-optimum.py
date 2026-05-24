@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """This module contains the `optimum_k` function
 
-that tests for the optimum number of clusters by variance.
+that tests the optimum number of clusters by variance.
 """
 import numpy as np
 
@@ -10,7 +10,7 @@ variance = __import__('2-variance').variance
 
 
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
-    """Tests for the optimum number of clusters by variance.
+    """Tests the optimum number of clusters by variance.
 
     Args:
         X: numpy.ndarray of shape (n, d) containing the data set.
@@ -20,8 +20,8 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
 
     Returns:
         results, d_vars:
-            results: list containing K-means outputs for each cluster size.
-            d_vars: list containing the variance differences from kmin.
+            results: list containing K-means outputs.
+            d_vars: list containing variance differences.
             Or None, None on failure.
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
@@ -40,7 +40,7 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
     results = []
     variances = []
 
-    # Loop 1: Run K-means and calculate variance for each k
+    # Execution blocks start here
     for k in range(kmin, kmax + 1):
         C, clss = kmeans(X, k, iterations)
         if C is None or clss is None:
@@ -56,7 +56,7 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
     d_vars = []
     base_variance = variances[0]
 
-    # Loop 2: Calculate the difference in variance relative to kmin
+    # Compute delta values against initial baseline
     for var in variances:
         d_vars.append(base_variance - var)
 
