@@ -7,8 +7,7 @@ import numpy as np
 
 
 def variance(X, C):
-    """Calculates the total intra-cluster variance for a data set.
-
+    """
     Args:
         X: numpy.ndarray of shape (n, d) containing the data set.
         C: numpy.ndarray of shape (k, d) containing the centroid means.
