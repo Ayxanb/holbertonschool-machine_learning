@@ -13,9 +13,7 @@ class BayesianOptimization:
 
     def __init__(self, f, X_init, Y_init, bounds, ac_samples,
                  l=1, sigma_f=1, xsi=0.01, minimize=True):
-        """
-        Initializes the Bayesian Optimization object.
-        """
+        """Initializes the Bayesian Optimization object."""
         self.f = f
         self.gp = GP(X_init, Y_init, l, sigma_f)
         self.X_s = np.linspace(bounds[0], bounds[1], ac_samples).reshape(-1, 1)
@@ -23,9 +21,7 @@ class BayesianOptimization:
         self.minimize = minimize
 
     def acquisition(self):
-        """
-        Calculates the next best sample location using Expected Improvement.
-        """
+        """Calculates the next best sample location using EI."""
         mu, sigma = self.gp.predict(self.X_s)
 
         if self.minimize:
@@ -44,18 +40,15 @@ class BayesianOptimization:
         ei[sigma == 0] = 0
 
         X_next = self.X_s[np.argmax(ei)]
-
         return X_next, ei
 
     def optimize(self, iterations=100):
-        """
-        Optimizes the black-box function.
-        """
+        """Optimizes the black-box function."""
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            # Check if point has already been sampled
-            if X_next in self.gp.X:
+            # Check if point has already been sampled (using a small tolerance)
+            if np.any(np.isclose(self.gp.X, X_next)):
                 break
 
             Y_next = self.f(X_next)
