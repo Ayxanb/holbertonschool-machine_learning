@@ -47,7 +47,6 @@ class BayesianOptimization:
         for _ in range(iterations):
             X_next, _ = self.acquisition()
 
-            # Check if point has already been sampled (using a small tolerance)
             if np.any(np.isclose(self.gp.X, X_next)):
                 break
 
@@ -59,7 +58,4 @@ class BayesianOptimization:
         else:
             idx = np.argmax(self.gp.Y)
 
-        X_opt = self.gp.X[idx]
-        Y_opt = self.gp.Y[idx]
-
-        return X_opt, Y_opt
+        return self.gp.X[idx], self.gp.Y[idx]
