@@ -26,9 +26,8 @@ class GaussianProcess:
         # Calculate squared Euclidean distance:
         # dist = (x - y)^2 = x^2 + y^2 - 2xy
         sqdist = (
-            np.sum(X1**2, 1).reshape(-1, 1)
-            + np.sum(X2**2, 1)
-            - 2 * np.dot(X1, X2.T)
+            np.sum(X1**2, 1).reshape(-1, 1) + \
+            np.sum(X2**2, 1) - 2 * np.dot(X1, X2.T)
         )
 
         # RBF Kernel formula: K(x, y) = sigma_f^2 * exp(-0.5 * dist / l^2)
