@@ -8,10 +8,7 @@ import tensorflow as tf
 
 
 class Simple_GAN:
-    """A Simple GAN class matching the automated test signature.
-
-    遵守 pycodestyle: 每行不超过 79 个字符。
-    """
+    """A Simple GAN class matching the automated test signature. """
 
     def __init__(self, generator, discriminator, latent_generator,
                  real_examples, learning_rate=0.001):
@@ -39,6 +36,19 @@ class Simple_GAN:
         )
 
         # Binary Crossentropy is the standard objective function for GANs
+        self.loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=False)
+
+    def compile(self):
+        """Configures the model components for training.
+
+        Called explicitly by the automated main testing script.
+        """
+        self.g_optimizer = tf.keras.optimizers.Adam(
+            learning_rate=self.learning_rate
+        )
+        self.d_optimizer = tf.keras.optimizers.Adam(
+            learning_rate=self.learning_rate
+        )
         self.loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     def train_step(self, real_images, latent_dim):
