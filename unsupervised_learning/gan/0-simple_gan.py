@@ -1,11 +1,30 @@
 #!/usr/bin/env python3
-import torch
+
+'''
+This module contains `Simple_GAN` class
+'''
+
+import tensorflow as tf
 
 
 class Simple_GAN:
+    """A clean, pycodestyle-compliant implementation of a Simple GAN.
+
+    This class manages the training step for both the Generator and
+    the Discriminator networks using TensorFlow's GradientTape.
+    """
 
     def __init__(self, generator, discriminator, g_optimizer, d_optimizer,
                  loss_fn):
+        """Initializes the GAN with models, optimizers, and a loss function.
+
+        Args:
+            generator: The tf.keras.Model producing synthetic data.
+            discriminator: The tf.keras.Model classifying real vs fake.
+            g_optimizer: tf.keras.optimizers.Optimizer for the generator.
+            d_optimizer: tf.keras.optimizers.Optimizer for the discriminator.
+            loss_fn: tf.keras.losses.Loss instance (typically BCE).
+        """
         self.generator = generator
         self.discriminator = discriminator
         self.g_optimizer = g_optimizer
@@ -13,44 +32,58 @@ class Simple_GAN:
         self.loss_fn = loss_fn
 
     def train_step(self, real_images, latent_dim):
-        """Performs a single training step for both the D and G networks."""
-        batch_size = real_images.size(0)
-        device = real_images.device
+        """Performs a single forward and backward pass for both networks.
 
-        # Labels for loss calculation
-        real_labels = torch.ones(batch_size, 1, device=device)
-        fake_labels = torch.zeros(batch_size, 1, device=device)
+        Args:
+            real_images: A batch of true data tensors from the dataset.
+            latent_dim: Integer, the size of the input noise vector.
 
-        # 1. Train Discriminator: maximize log(D(x)) + log(1 - D(G(z)))
-        self.d_optimizer.zero_grad()
+        Returns:
+            d_loss: The scalar loss value for the discriminator.
+            g_loss: The scalar loss value for the generator.
+        """
+        batch_size = tf.shape(real_images)[0]
 
-        # Test Discriminator on real images
-        outputs_real = self.discriminator(real_images)
-        d_loss_real = self.loss_fn(outputs_real, real_labels)
+        # Ground truth labels for the loss functions
+        real_labels = tf.ones((batch_size, 1))
+        fake_labels = tf.zeros((batch_size, 1))
 
-        # Generate fake images from random latent vectors
-        z = torch.randn(batch_size, latent_dim, device=device)
-        fake_images = self.generator(z)
+        # Sample random noise from a standard normal distribution
+        z = tf.random.normal([batch_size, latent_dim])
 
-        # Test Discriminator on fake images
-        # We detach fake_images because we are only training D here
-        outputs_fake = self.discriminator(fake_images.detach())
-        d_loss_fake = self.loss_fn(outputs_fake, fake_labels)
+        # Track operations to compute gradients
+        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+            # Generate a batch of fake images
+            fake_images = self.generator(z, training=True)
 
-        # Combine losses and update Discriminator
-        d_loss = d_loss_real + d_loss_fake
-        d_loss.backward()
-        self.d_optimizer.step()
+            # Pass both real and fake images through the discriminator
+            real_output = self.discriminator(real_images, training=True)
+            fake_output = self.discriminator(fake_images, training=True)
 
-        # 2. Train Generator: maximize log(D(G(z)))
-        self.g_optimizer.zero_grad()
+            # Discriminator Loss: minimize error on both real and fake batches
+            d_loss_real = self.loss_fn(real_labels, real_output)
+            d_loss_fake = self.loss_fn(fake_labels, fake_output)
+            d_loss = d_loss_real + d_loss_fake
 
-        # We want the Discriminator to mistake these fakes for real
-        outputs_fake_for_g = self.discriminator(fake_images)
-        g_loss = self.loss_fn(outputs_fake_for_g, real_labels)
+            # Generator Loss: maximize the probability of D being fooled
+            g_loss = self.loss_fn(real_labels, fake_output)
 
-        # Update Generator
-        g_loss.backward()
-        self.g_optimizer.step()
+        # Calculate gradients with respect to respective trainable weights
+        gradients_of_discriminator = disc_tape.gradient(
+            d_loss, self.discriminator.trainable_variables
+        )
+        gradients_of_generator = gen_tape.gradient(
+            g_loss, self.generator.trainable_variables
+        )
 
-        return d_loss.item(), g_loss.item()
+        # Apply gradients to optimize the weights
+        self.d_optimizer.apply_gradients(
+            zip(gradients_of_discriminator,
+                self.discriminator.trainable_variables)
+        )
+        self.g_optimizer.apply_gradients(
+            zip(gradients_of_generator,
+                self.generator.trainable_variables)
+        )
+
+        return d_loss, g_loss
