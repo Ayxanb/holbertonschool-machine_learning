@@ -7,42 +7,26 @@ This module contains `Simple_GAN` class
 import tensorflow as tf
 
 
-class Simple_GAN:
-    """A Simple GAN class matching the automated test signature. """
+class Simple_GAN(tf.keras.Model):
+    """A Simple GAN class compliant with Keras and the testing framework. """
 
     def __init__(self, generator, discriminator, latent_generator,
-                 real_examples, learning_rate=0.001):
-        """Initializes the GAN with models, generators, and learning rate.
-
-        Args:
-            generator: The tf.keras.Model producing synthetic data.
-            discriminator: The tf.keras.Model classifying real vs fake.
-            latent_generator: A callable function/object that yields random
-                latent vectors (noise) when called.
-            real_examples: The training dataset tensor or array.
-            learning_rate: Float, the step size for the Adam optimizers.
-        """
+                 real_examples, learning_rate=0.001, **kwargs):
+        """Initializes the GAN components and sets up learning rates."""
+        super().__init__(**kwargs)
         self.generator = generator
         self.discriminator = discriminator
         self.latent_generator = latent_generator
         self.real_examples = real_examples
+        self.learning_rate = learning_rate
 
-        # Define internal optimizers using the provided learning rate
-        self.g_optimizer = tf.keras.optimizers.Adam(
-            learning_rate=learning_rate
-        )
-        self.d_optimizer = tf.keras.optimizers.Adam(
-            learning_rate=learning_rate
-        )
-
-        # Binary Crossentropy is the standard objective function for GANs
-        self.loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=False)
+        # Placeholders for optimization objects built during compile
+        self.g_optimizer = None
+        self.d_optimizer = None
+        self.loss_fn = None
 
     def compile(self):
-        """Configures the model components for training.
-
-        Called explicitly by the automated main testing script.
-        """
+        """Configures the model components for training."""
         self.g_optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate
         )
@@ -68,10 +52,8 @@ class Simple_GAN:
         real_labels = tf.ones((batch_size, 1))
         fake_labels = tf.zeros((batch_size, 1))
 
-        # Notice: You can either sample via your latent_generator()
-        # or stick to tf.random.normal depending on instruction details.
-        # Here we follow standard practice using latent_dim:
-        z = tf.random.normal([batch_size, latent_dim])
+        # Sample random noise using the provided latent_generator function
+        z = self.latent_generator(batch_size, latent_dim)
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             # Generate fake samples
