@@ -26,11 +26,7 @@ class Simple_GAN(tf.keras.Model):
         self.loss_fn = None
 
     def compile(self):
-        """Configures the model components and signals Keras compilation.
-
-        Calls super().compile() to properly flip internal Keras flags
-        so that lifecycle methods like `.fit()` function correctly.
-        """
+        """Configures the model components and signals Keras compilation."""
         self.g_optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate
         )
@@ -45,9 +41,6 @@ class Simple_GAN(tf.keras.Model):
     def train_step(self, data):
         """Performs a single training step.
 
-        Keras `.fit()` automatically calls this method and passes only
-        the current batch of data (`real_images`).
-
         Args:
             data: A batch of true data tensors from the dataset.
 
@@ -61,8 +54,14 @@ class Simple_GAN(tf.keras.Model):
         real_labels = tf.ones((batch_size, 1))
         fake_labels = tf.zeros((batch_size, 1))
 
-        # Sample random noise using stored instance attribute latent_dim
-        z = self.latent_generator(batch_size, self.latent_dim)
+        # Dynamically infer latent_dim from the generator's input shape
+        if isinstance(self.generator.input_shape, list):
+            latent_dim = self.generator.input_shape[0][-1]
+        else:
+            latent_dim = self.generator.input_shape[-1]
+
+        # Sample random noise using the provided latent_generator function
+        z = self.latent_generator(batch_size, latent_dim)
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             # Generate fake samples
@@ -96,5 +95,4 @@ class Simple_GAN(tf.keras.Model):
                 self.generator.trainable_variables)
         )
 
-        # Keras expects a dictionary of metric/loss tracking names back
         return {"d_loss": d_loss, "g_loss": g_loss}
