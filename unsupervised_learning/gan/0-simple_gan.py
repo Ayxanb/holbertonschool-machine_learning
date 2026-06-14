@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-This module contains `Simple_GAN` module.
+This module contains `Simple_GAN` class
 '''
 
 import tensorflow as tf
@@ -26,7 +26,11 @@ class Simple_GAN(tf.keras.Model):
         self.loss_fn = None
 
     def compile(self):
-        """Configures the model components and signals Keras compilation."""
+        """Configures the model components and signals Keras compilation.
+
+        Avoids passing loss to super().compile() to prevent Keras from
+        automatically adding an extra 'loss' key to history logs.
+        """
         self.g_optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate
         )
@@ -37,8 +41,11 @@ class Simple_GAN(tf.keras.Model):
             from_logits=False
         )
 
-        # Satisfy internal Keras compilation verification flags
-        super().compile(optimizer=self.d_optimizer, loss=self.loss_fn)
+        # Set standard optimizer attribute to satisfy internal checks
+        self.optimizer = self.d_optimizer
+
+        # Call super version without loss to bypass default tracking
+        super().compile()
 
     def train_step(self, data):
         """Performs a single training step.
