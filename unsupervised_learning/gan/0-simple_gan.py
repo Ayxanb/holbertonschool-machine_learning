@@ -8,11 +8,11 @@ import tensorflow as tf
 
 
 class Simple_GAN(tf.keras.Model):
-    """A Simple GAN class compliant with Keras and the testing framework. """
+    """A Simple GAN class compliant with Keras lifecycle and testing."""
 
     def __init__(self, generator, discriminator, latent_generator,
                  real_examples, learning_rate=0.001, **kwargs):
-        """Initializes the GAN components and sets up learning rates."""
+        """Initializes the GAN components and hyper-parameters."""
         super().__init__(**kwargs)
         self.generator = generator
         self.discriminator = discriminator
@@ -26,7 +26,11 @@ class Simple_GAN(tf.keras.Model):
         self.loss_fn = None
 
     def compile(self):
-        """Configures the model components for training."""
+        """Configures the model components and signals Keras compilation.
+
+        Calls super().compile() to properly flip internal Keras flags
+        so that lifecycle methods like `.fit()` function correctly.
+        """
         self.g_optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate
         )
@@ -34,6 +38,9 @@ class Simple_GAN(tf.keras.Model):
             learning_rate=self.learning_rate
         )
         self.loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=False)
+
+        # Satisfy internal Keras compilation verification flags
+        super().compile(optimizer=self.d_optimizer, loss=self.loss_fn)
 
     def train_step(self, real_images, latent_dim):
         """Performs a single forward and backward training pass.
