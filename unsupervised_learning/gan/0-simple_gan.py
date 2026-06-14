@@ -42,25 +42,27 @@ class Simple_GAN(tf.keras.Model):
         # Satisfy internal Keras compilation verification flags
         super().compile(optimizer=self.d_optimizer, loss=self.loss_fn)
 
-    def train_step(self, real_images, latent_dim):
-        """Performs a single forward and backward training pass.
+    def train_step(self, data):
+        """Performs a single training step.
+
+        Keras `.fit()` automatically calls this method and passes only
+        the current batch of data (`real_images`).
 
         Args:
-            real_images: A batch of true data tensors from the dataset.
-            latent_dim: Integer, the dimension size of the noise vector.
+            data: A batch of true data tensors from the dataset.
 
         Returns:
-            d_loss: The scalar loss value for the discriminator.
-            g_loss: The scalar loss value for the generator.
+            A dictionary containing the loss values for monitoring.
         """
+        real_images = data
         batch_size = tf.shape(real_images)[0]
 
         # Targets for Binary Crossentropy
         real_labels = tf.ones((batch_size, 1))
         fake_labels = tf.zeros((batch_size, 1))
 
-        # Sample random noise using the provided latent_generator function
-        z = self.latent_generator(batch_size, latent_dim)
+        # Sample random noise using stored instance attribute latent_dim
+        z = self.latent_generator(batch_size, self.latent_dim)
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             # Generate fake samples
@@ -94,4 +96,5 @@ class Simple_GAN(tf.keras.Model):
                 self.generator.trainable_variables)
         )
 
-        return d_loss, g_loss
+        # Keras expects a dictionary of metric/loss tracking names back
+        return {"d_loss": d_loss, "g_loss": g_loss}
