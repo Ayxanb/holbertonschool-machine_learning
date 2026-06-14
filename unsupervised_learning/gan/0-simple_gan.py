@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-This module contains `Simple_GAN` class
+This module contains `Simple_GAN` module.
 '''
 
 import tensorflow as tf
@@ -33,7 +33,9 @@ class Simple_GAN(tf.keras.Model):
         self.d_optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate
         )
-        self.loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=False)
+        self.loss_fn = tf.keras.losses.BinaryCrossentropy(
+            from_logits=False
+        )
 
         # Satisfy internal Keras compilation verification flags
         super().compile(optimizer=self.d_optimizer, loss=self.loss_fn)
@@ -54,14 +56,8 @@ class Simple_GAN(tf.keras.Model):
         real_labels = tf.ones((batch_size, 1))
         fake_labels = tf.zeros((batch_size, 1))
 
-        # Dynamically infer latent_dim from the generator's input shape
-        if isinstance(self.generator.input_shape, list):
-            latent_dim = self.generator.input_shape[0][-1]
-        else:
-            latent_dim = self.generator.input_shape[-1]
-
-        # Sample random noise using the provided latent_generator function
-        z = self.latent_generator(batch_size, latent_dim)
+        # Call latent_generator with only batch_size as expected
+        z = self.latent_generator(batch_size)
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             # Generate fake samples
