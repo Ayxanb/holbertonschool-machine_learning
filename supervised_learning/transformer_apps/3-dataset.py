@@ -10,14 +10,35 @@ from setup import load_pt2en
 class Dataset:
     """Loads and preps a dataset for machine translation."""
 
-    def __init__(self):
-        """Sets data_train, data_valid, tokenizer_pt and tokenizer_en."""
+    def __init__(self, batch_size, max_len):
+        """Sets data_train, data_valid, tokenizer_pt and tokenizer_en.
+
+        Args:
+            batch_size: batch size for training/validation.
+            max_len: maximum number of tokens allowed per example
+                sentence.
+        """
+        self.batch_size = batch_size
+        self.max_len = max_len
+
         self.data_train = load_pt2en('train')
         self.data_valid = load_pt2en('validation')
+
         self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
             self.data_train)
+
         self.data_train = self.data_train.map(self.tf_encode)
         self.data_valid = self.data_valid.map(self.tf_encode)
+
+        self.data_train = self.data_train.filter(self.filter_max_length)
+        self.data_train = self.data_train.cache()
+        self.data_train = self.data_train.shuffle(20000)
+        self.data_train = self.data_train.padded_batch(self.batch_size)
+        self.data_train = self.data_train.prefetch(
+            tf.data.experimental.AUTOTUNE)
+
+        self.data_valid = self.data_valid.filter(self.filter_max_length)
+        self.data_valid = self.data_valid.padded_batch(self.batch_size)
 
     def tokenize_dataset(self, data):
         """Creates sub-word tokenizers for the dataset.
@@ -99,6 +120,20 @@ class Dataset:
         en_tokens.set_shape([None])
 
         return pt_tokens, en_tokens
+
+    def filter_max_length(self, pt, en):
+        """Filters out examples with either sentence exceeding
+        max_len tokens.
+
+        Args:
+            pt: tensor containing the Portuguese tokens.
+            en: tensor containing the English tokens.
+
+        Returns:
+            bool tensor, True if both sentences are within max_len.
+        """
+        return tf.logical_and(
+            tf.size(pt) <= self.max_len, tf.size(en) <= self.max_len)
 
     @staticmethod
     def _batch_iterator(sentences, batch_size=1000):
