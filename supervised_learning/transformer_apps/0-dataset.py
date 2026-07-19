@@ -2,8 +2,7 @@
 """Defines the Dataset class used to load and prep the pt->en
 translation corpus for machine translation.
 """
-import tensorflow as tf
-from transformers import AutoTokenizer
+import transformers
 from setup import load_pt2en
 
 
@@ -21,11 +20,11 @@ class Dataset:
         """Creates sub-word tokenizers for the dataset.
 
         Args:
-            data: tf.data.Dataset whose examples are formatted as a
-                tuple (pt, en):
-                    pt is the tf.Tensor containing the Portuguese
+            data: a Dataset whose examples are formatted as a tuple
+                (pt, en):
+                    pt is the Tensor containing the Portuguese
                         sentence.
-                    en is the tf.Tensor containing the corresponding
+                    en is the Tensor containing the corresponding
                         English sentence.
 
         Returns:
@@ -40,9 +39,10 @@ class Dataset:
             pt_sentences.append(pt.decode('utf-8'))
             en_sentences.append(en.decode('utf-8'))
 
-        base_pt = AutoTokenizer.from_pretrained(
+        base_pt = transformers.AutoTokenizer.from_pretrained(
             'neuralmind/bert-base-portuguese-cased')
-        base_en = AutoTokenizer.from_pretrained('bert-base-uncased')
+        base_en = transformers.AutoTokenizer.from_pretrained(
+            'bert-base-uncased')
 
         tokenizer_pt = base_pt.train_new_from_iterator(
             self._batch_iterator(pt_sentences), vocab_size=vocab_size)
