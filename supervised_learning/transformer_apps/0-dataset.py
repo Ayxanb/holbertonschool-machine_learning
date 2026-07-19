@@ -1,64 +1,66 @@
 #!/usr/bin/env python3
+"""Defines the Dataset class used to load and prep the pt->en
+translation corpus for machine translation.
 """
-Module for machine translation data preparation.
-"""
-import transformers
+import tensorflow as tf
+from transformers import AutoTokenizer
 from setup import load_pt2en
 
 
 class Dataset:
-    """
-    Dataset class for loading and preparing translation data.
-    """
+    """Loads and preps a dataset for machine translation."""
 
     def __init__(self):
-        """
-        Initializes the dataset splits and trains the tokenizers.
-        """
+        """Sets data_train, data_valid, tokenizer_pt and tokenizer_en."""
         self.data_train = load_pt2en('train')
         self.data_valid = load_pt2en('validation')
-
-        pt_tok, en_tok = self.tokenize_dataset(self.data_train)
-        self.tokenizer_pt = pt_tok
-        self.tokenizer_en = en_tok
+        self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(
+            self.data_train)
 
     def tokenize_dataset(self, data):
-        """
-        Creates sub-word tokenizers for the provided dataset.
+        """Creates sub-word tokenizers for the dataset.
 
         Args:
-            data: The dataset containing pairs of sentences.
+            data: tf.data.Dataset whose examples are formatted as a
+                tuple (pt, en):
+                    pt is the tf.Tensor containing the Portuguese
+                        sentence.
+                    en is the tf.Tensor containing the corresponding
+                        English sentence.
 
         Returns:
-            Tuple containing the trained pt and en tokenizers.
+            tokenizer_pt, tokenizer_en: the trained Portuguese and
+                English tokenizers.
         """
-        model_pt = 'neuralmind/bert-base-portuguese-cased'
-        model_en = 'bert-base-uncased'
+        vocab_size = 2 ** 13
 
-        tokenizer_pt = transformers.AutoTokenizer.from_pretrained(
-            model_pt
-        )
-        tokenizer_en = transformers.AutoTokenizer.from_pretrained(
-            model_en
-        )
+        pt_sentences = []
+        en_sentences = []
+        for pt, en in data.as_numpy_iterator():
+            pt_sentences.append(pt.decode('utf-8'))
+            en_sentences.append(en.decode('utf-8'))
 
-        def pt_iter():
-            """Generator that yields Portuguese text."""
-            for pt, _ in data.as_numpy_iterator():
-                yield pt.decode('utf-8')
+        base_pt = AutoTokenizer.from_pretrained(
+            'neuralmind/bert-base-portuguese-cased')
+        base_en = AutoTokenizer.from_pretrained('bert-base-uncased')
 
-        def en_iter():
-            """Generator that yields English text."""
-            for _, en in data.as_numpy_iterator():
-                yield en.decode('utf-8')
-
-        vocab_size = 2**13
-
-        tokenizer_pt = tokenizer_pt.train_new_from_iterator(
-            pt_iter(), vocab_size
-        )
-        tokenizer_en = tokenizer_en.train_new_from_iterator(
-            en_iter(), vocab_size
-        )
+        tokenizer_pt = base_pt.train_new_from_iterator(
+            self._batch_iterator(pt_sentences), vocab_size=vocab_size)
+        tokenizer_en = base_en.train_new_from_iterator(
+            self._batch_iterator(en_sentences), vocab_size=vocab_size)
 
         return tokenizer_pt, tokenizer_en
+
+    @staticmethod
+    def _batch_iterator(sentences, batch_size=1000):
+        """Yields successive batches of sentences.
+
+        Args:
+            sentences: list of str sentences.
+            batch_size: number of sentences per yielded batch.
+
+        Yields:
+            list of str, a batch of sentences.
+        """
+        for i in range(0, len(sentences), batch_size):
+            yield sentences[i:i + batch_size]
