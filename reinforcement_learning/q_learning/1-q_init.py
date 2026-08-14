@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""Module for Q-learning initialization and table management."""
+
 import numpy as np
 
 
