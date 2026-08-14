@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Module for initializing Gymnasium reinforcement learning environments.
 
 Provides helper utilities to create standard or custom instances of
