@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Module for playing an episode using a trained Q-learning agent."""
 
 import numpy as np
@@ -18,14 +16,12 @@ def play(env, Q, max_steps=100):
             and a list of board states rendered as ANSI strings.
     """
     rendered_outputs = []
-    total_reward = 0
+    total_reward = 0.0
 
     reset_res = env.reset()
     state = reset_res[0] if isinstance(reset_res, tuple) else reset_res
 
-    board = env.render()
-    rendered_outputs.append(board)
-    print(board, end="")
+    rendered_outputs.append(env.render())
 
     for _ in range(max_steps):
         action = np.argmax(Q[state])
@@ -38,9 +34,7 @@ def play(env, Q, max_steps=100):
             next_state, reward, done, _ = step_res
 
         total_reward += reward
-        board = env.render()
-        rendered_outputs.append(board)
-        print(board, end="")
+        rendered_outputs.append(env.render())
 
         state = next_state
 
