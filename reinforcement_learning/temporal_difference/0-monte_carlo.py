@@ -1,47 +1,43 @@
 #!/usr/bin/env python3
-"""Module that contains the Monte Carlo value estimation algorithm."""
-
+"""Monte Carlo algorithm for value estimation."""
 import numpy as np
 
 
-def monte_carlo(
-    env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99
-):
-    """Performs the Monte Carlo algorithm for value estimation.
+def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
+                 alpha=0.1, gamma=0.99):
+    """Perform the Monte Carlo algorithm.
 
     Args:
-        env: Environment instance.
-        V (numpy.ndarray): Array of shape (s,) containing value estimates.
-        policy (function): Function taking a state and returning action.
-        episodes (int): Total number of episodes to train over.
-        max_steps (int): Maximum number of steps per episode.
-        alpha (float): Learning rate.
-        gamma (float): Discount rate.
+        env: the environment instance.
+        V: numpy.ndarray of shape (s,) containing the value estimate.
+        policy: a function that takes in a state and returns the next
+            action to take.
+        episodes: the total number of episodes to train over.
+        max_steps: the maximum number of steps per episode.
+        alpha: the learning rate.
+        gamma: the discount rate.
 
     Returns:
-        numpy.ndarray: The updated value estimate V.
+        V, the updated value estimate.
     """
-    for _ in range(episodes):
-        state = env.reset()
-        if isinstance(state, tuple):
-            state = state[0]
-
+    for ep in range(episodes):
+        state, _ = env.reset()
         episode = []
-        for _ in range(max_steps):
-            action = policy(state)
-            res = env.step(action)
-            next_state, reward, done = res[0], res[1], res[2]
-            episode.append((state, reward))
-            if done:
-                break
-            state = next_state
 
+        for step in range(max_steps):
+            action = policy(state)
+            next_state, reward, terminated, truncated, _ = env.step(action)
+            episode.append((state, reward))
+            state = next_state
+            if terminated or truncated:
+                break
+
+        episode = np.array(episode, dtype=int)
         G = 0
-        states = [step[0] for step in episode]
-        for t in range(len(episode) - 1, -1, -1):
-            state, reward = episode[t]
-            G = gamma * G + reward
-            if state not in states[:t]:
+        for state, reward in episode[::-1]:
+            G = reward + gamma * G
+            if state not in episode[:episode.tolist().index(
+                    [state, reward]), 0]:
                 V[state] = V[state] + alpha * (G - V[state])
 
     return V
