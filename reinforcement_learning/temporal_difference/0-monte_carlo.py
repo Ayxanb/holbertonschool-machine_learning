@@ -1,48 +1,44 @@
-#!/usr/bin/env python3
-"""Monte Carlo algorithm for value estimation."""
 import numpy as np
 
 
-def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
-                alpha=0.1, gamma=0.99):
-    """Perform the Monte Carlo algorithm.
-
-    Args:
-        env: the environment instance.
-        V: numpy.ndarray of shape (s,) containing the value estimate.
-        policy: a function that takes in a state and returns the next
-            action to take.
-        episodes: the total number of episodes to train over.
-        max_steps: the maximum number of steps per episode.
-        alpha: the learning rate.
-        gamma: the discount rate.
-
-    Returns:
-        V, the updated value estimate.
+def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
     """
-    for _ in range(episodes):
-        state, _ = env.reset()
+    Performs the Monte Carlo algorithm to estimate the value function.
+
+    env      - environment instance
+    V        - numpy.ndarray of shape (s,), the value estimate
+    policy   - function that takes a state and returns the next action
+    episodes - total number of episodes to train over
+    max_steps - maximum number of steps per episode
+    alpha    - learning rate
+    gamma    - discount rate
+
+    Returns: V, the updated value estimate
+    """
+    for ep in range(episodes):
+        state = env.reset()[0]
         episode = []
 
-        for _ in range(max_steps):
+        # Generate an episode
+        for step in range(max_steps):
             action = policy(state)
-            step_result = env.step(action)
-            next_state, reward, terminated, truncated, _ = step_result
+            next_state, reward, terminated, truncated, info = env.step(action)
             episode.append((state, reward))
             state = next_state
             if terminated or truncated:
                 break
 
-        states = np.array([step[0] for step in episode], dtype=int)
-        rewards = np.array([step[1] for step in episode], dtype=float)
-        G = 0.0
+        episode = np.array(episode, dtype=int)
+        G = 0
 
-        for i in range(len(episode) - 1, -1, -1):
-            state = states[i]
-            reward = rewards[i]
-            G = reward + gamma * G
+        # Work backwards through the episode, computing returns
+        for t in reversed(range(len(episode))):
+            state_t, reward_t = episode[t]
+            G = reward_t + gamma * G
 
-            if state not in states[:i]:
-                V[state] = V[state] + alpha * (G - V[state])
+            # First-visit check: only update if this state hasn't
+            # appeared earlier in the episode
+            if state_t not in episode[:t, 0]:
+                V[state_t] = V[state_t] + alpha * (G - V[state_t])
 
     return V
