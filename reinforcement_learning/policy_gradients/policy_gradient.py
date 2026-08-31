@@ -19,6 +19,7 @@ def policy(matrix, weight):
     exp = np.exp(z)
     return exp / np.sum(exp)
 
+
 def policy_gradient(state, weight):
     """Compute an action and the gradient of the policy.
 
