@@ -63,6 +63,4 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
         for grad, reward_to_go in zip(gradients, returns):
             weight += alpha * reward_to_go * grad
 
-        print("Episode: {} Score: {}".format(episode + 1, score))
-
-    return np.asarray(scores)
+    return scores
