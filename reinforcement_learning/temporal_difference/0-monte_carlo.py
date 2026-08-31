@@ -21,11 +21,19 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1,
     """
     for _ in range(episodes):
         state = env.reset()
+        if isinstance(state, tuple) and len(state) == 2 and isinstance(
+                state[1], dict):
+            state = state[0]
+
         episode = []
         for _ in range(max_steps):
             action = policy(state)
-            next_state, reward, done, _ = env.step(action)
-            episode.append([state, reward])
+            res = env.step(action)
+            next_state = res[0]
+            reward = res[1]
+            done = res[2]
+
+            episode.append((state, reward))
             if done:
                 break
             state = next_state
