@@ -3,23 +3,6 @@
 import numpy as np
 
 
-def epsilon_greedy_action(Q, state, epsilon, env):
-    """Selects an action using the epsilon-greedy strategy.
-
-    Args:
-        Q: numpy.ndarray of shape (s, a) containing the Q table
-        state: int representing the current state
-        epsilon: float threshold for exploration vs exploitation
-        env: environment instance
-
-    Returns:
-        int: selected action
-    """
-    if np.random.uniform(0, 1) < epsilon:
-        return env.action_space.sample()
-    return np.argmax(Q[state])
-
-
 def sarsa_lambtha(
     env,
     Q,
@@ -28,7 +11,7 @@ def sarsa_lambtha(
     max_steps=100,
     alpha=0.1,
     gamma=0.99,
-    epsilon=1.0,
+    epsilon=1,
     min_epsilon=0.1,
     epsilon_decay=0.05
 ):
@@ -53,16 +36,23 @@ def sarsa_lambtha(
 
     for ep in range(episodes):
         state, _ = env.reset()
-        action = epsilon_greedy_action(Q, state, epsilon, env)
         E = np.zeros_like(Q)
+
+        # Select initial action using epsilon-greedy
+        if np.random.uniform(0, 1) < epsilon:
+            action = env.action_space.sample()
+        else:
+            action = np.argmax(Q[state])
 
         for _ in range(max_steps):
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
 
-            next_action = epsilon_greedy_action(
-                Q, next_state, epsilon, env
-            )
+            # Select next action using epsilon-greedy
+            if np.random.uniform(0, 1) < epsilon:
+                next_action = env.action_space.sample()
+            else:
+                next_action = np.argmax(Q[next_state])
 
             delta = reward + gamma * Q[next_state, next_action] - Q[state, action]
             E[state, action] += 1.0
@@ -76,8 +66,9 @@ def sarsa_lambtha(
             state = next_state
             action = next_action
 
-        epsilon = min_epsilon + (initial_epsilon - min_epsilon) * np.exp(
-            -epsilon_decay * ep
+        # Linear decay matching standard assignment spec
+        epsilon = min_epsilon + (initial_epsilon - min_epsilon) * (
+            1 - ep / episodes
         )
 
     return Q
