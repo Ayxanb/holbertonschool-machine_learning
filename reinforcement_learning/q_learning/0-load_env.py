@@ -1,24 +1,19 @@
-"""Module for initializing Gymnasium reinforcement learning environments."""
+#!/usr/bin/env python3
+"""Module for loading the FrozenLake environment."""
 
 import gymnasium as gym
 
 
 def load_frozen_lake(desc=None, map_name=None, is_slippery=False):
-    """Load the FrozenLake-v1 environment from Gymnasium.
+    """Load the pre-made FrozenLakeEnv from Gymnasium.
 
     Args:
-        desc: Custom map description or None.
-        map_name: Pre-made map name ('4x4', '8x8') or None.
-        is_slippery: Boolean indicating if ice actions are stochastic.
+        desc: None or a list of lists containing a custom map description.
+        map_name: None or a string containing a pre-made map name.
+        is_slippery: Boolean determining if the ice is slippery.
 
     Returns:
-        The instantiated Gymnasium environment.
+        The FrozenLake environment.
     """
-    env = gym.make(
-        "FrozenLake-v1",
-        desc=desc,
-        map_name=map_name,
-        is_slippery=is_slippery,
-        render_mode="ansi",
-    )
-    return env
+    return gym.make('FrozenLake-v1', desc=desc, map_name=map_name,
+                    is_slippery=is_slippery, render_mode="ansi")
